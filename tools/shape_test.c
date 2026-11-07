@@ -257,6 +257,37 @@ static void test_all_patterns(void)
     printf("       (%d patterns, %d bullets total)\n", PATTERN_COUNT, spawned);
 }
 
+/* Sprite ids are per-name: same name gives the same id, "" gives -1 (circle). */
+static void test_sprite_ids(void)
+{
+    printf("bullet sprites:\n");
+    Pattern p = pattern_apply_defaults((Pattern){ 0 });
+    p.aim = AIM_PLAYER;
+    p.count = 2;
+    p.speed = 300;
+    snprintf(p.sprite, SPRITE_NAME_MAX, "bullet_orb");
+
+    BulletList a, b;
+    a.count = 0;
+    b.count = 0;
+    SpinState spin = { 0 };
+    spawn_from_pattern(&a, &p, BASE_W, BASE_H, 600, 300, &spin);
+    spin.angle = 0.0f;
+    spawn_from_pattern(&b, &p, BASE_W, BASE_H, 600, 300, &spin);
+
+    check(a.count == 2 && b.count == 2, "a sprite pattern still spawns its bullets");
+    check(a.items[0].sprite >= 0, "the sprite name resolves to an id");
+    check(a.items[0].sprite == a.items[1].sprite, "both bullets share one sprite id");
+    check(a.items[0].sprite == b.items[0].sprite, "the same name resolves to the same id");
+    check(near(a.items[0].sprite_size, p.radius * 2.0f, 0.01f), "sprite size defaults to the diameter");
+    check(a.items[0].sprite_rot == SPRITE_ROT_NONE, "sprites default to upright");
+
+    p.sprite[0] = '\0';
+    a.count = 0;
+    spawn_from_pattern(&a, &p, BASE_W, BASE_H, 600, 300, &spin);
+    check(a.items[0].sprite == -1, "no sprite means the circle fallback");
+}
+
 int main(void)
 {
     printf("shape tests\n===========\n");
@@ -265,6 +296,7 @@ int main(void)
     test_formation();
     test_formation_static();
     test_all_patterns();
+    test_sprite_ids();
 
     printf("\n%s (%d failure%s)\n",
            failures ? "FAILED" : "all good", failures, failures == 1 ? "" : "s");

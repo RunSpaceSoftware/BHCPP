@@ -39,6 +39,14 @@ typedef enum { SIDE_TOP = 0, SIDE_BOTTOM, SIDE_LEFT, SIDE_RIGHT } Side;
 #define DEFAULT_DAMAGE 10
 #define DEFAULT_RADIUS 6.0f
 
+#define SPRITE_NAME_MAX 64
+
+/* How a bullet sprite is turned when drawn. */
+typedef enum {
+    SPRITE_ROT_NONE = 0,   /* drawn upright */
+    SPRITE_ROT_TRAVEL      /* turned to face the direction of travel */
+} SpriteRot;
+
 typedef struct {
     const char *name;
     Origin origin;
@@ -62,6 +70,9 @@ typedef struct {
     float min_radius;       /* encircle / cross (default 70) */
     int segments;           /* spear / formation (default 3) */
     float length;           /* spear / formation (default 90) */
+    char sprite[SPRITE_NAME_MAX]; /* png in resources/, "" = draw a circle */
+    float sprite_size;      /* drawn size in px (default: 2*radius) */
+    SpriteRot sprite_rot;   /* how the sprite is turned when drawn */
 } Pattern;
 
 #define MAX_PATTERNS 64

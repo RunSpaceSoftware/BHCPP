@@ -90,6 +90,12 @@ static float status_time = -10.0f;
 static bool editing_name = false;
 static char name_buf[PATTERN_NAME_MAX] = { 0 };
 
+/* pngs found in the resources folder, entry 0 = "" (draw a circle) */
+#define MAX_SPRITE_CHOICES 32
+static char        sprite_choices[MAX_SPRITE_CHOICES][SPRITE_NAME_MAX];
+static const char *sprite_labels[MAX_SPRITE_CHOICES];
+static int         sprite_choice_count = 1;
+
 /* --------------------------------------------------------------- helpers */
 static void say(const char *text)
 {
@@ -131,6 +137,43 @@ static void select_pattern(int index)
     if (sel < list_offset) list_offset = sel;
     if (sel >= list_offset + LIST_VISIBLE) list_offset = sel - LIST_VISIBLE + 1;
     reset_preview();
+}
+
+/* Bullet sprites available to pick from: every png next to patterns.txt.
+   Entry 0 stays the empty name so a pattern can go back to a plain circle. */
+static void scan_sprites(void)
+{
+    sprite_choice_count = 1;
+    snprintf(sprite_choices[0], SPRITE_NAME_MAX, "%s", "");
+    sprite_labels[0] = "(circle)";
+
+    char dir[4096];
+    snprintf(dir, sizeof dir, "%s", GetDirectoryPath(path));
+    FilePathList files = LoadDirectoryFilesEx(dir, ".png", false);
+    for (unsigned i = 0; i < files.count && sprite_choice_count < MAX_SPRITE_CHOICES; i++) {
+        const char *base = GetFileNameWithoutExt(files.paths[i]);  /* static buffer: copy now */
+        if (!base || !*base) continue;
+        if (strcmp(base, "player") == 0) continue;   /* the ship, not a bullet */
+        snprintf(sprite_choices[sprite_choice_count], SPRITE_NAME_MAX, "%s", base);
+        sprite_labels[sprite_choice_count] = sprite_choices[sprite_choice_count];
+        sprite_choice_count++;
+    }
+    UnloadDirectoryFiles(files);
+}
+
+/* Index of `name` in the sprite list; an unknown name is appended so editing a
+   hand-written pattern never silently loses its sprite. */
+static int sprite_index(const char *name)
+{
+    if (!name || !*name) return 0;
+    for (int i = 1; i < sprite_choice_count; i++)
+        if (strcmp(sprite_choices[i], name) == 0) return i;
+    if (sprite_choice_count < MAX_SPRITE_CHOICES) {
+        snprintf(sprite_choices[sprite_choice_count], SPRITE_NAME_MAX, "%s", name);
+        sprite_labels[sprite_choice_count] = sprite_choices[sprite_choice_count];
+        return sprite_choice_count++;
+    }
+    return 0;
 }
 
 /* ------------------------------------------------------------ file paths */
@@ -183,6 +226,7 @@ static void load_initial(const char *arg)
     count = n;
     fix_names();
     resolve_path(arg);
+    scan_sprites();
     sel = 0;
     reset_preview();
 }
@@ -211,6 +255,8 @@ static void do_reload(void)
         fix_names();
         if (sel >= count) sel = count - 1;
         reset_preview();
+        scan_sprites();              /* picks up pngs dropped in since start-up */
+        reload_bullet_sprites();     /* reset_preview() cleared the bullets above */
         say("reloaded from disk");
     } else {
         say(err);
@@ -600,6 +646,7 @@ static bool panel_has_radii(const Pattern *p)
 {
     return p->aim == AIM_ENCIRCLE || p->aim == AIM_CROSS;
 }
+static bool panel_has_sprite(const Pattern *p) { return p->sprite[0] != '\0'; }
 
 /* Number of property rows draw_panel() will draw for p. */
 static int panel_row_count(const Pattern *p)
@@ -615,6 +662,8 @@ static int panel_row_count(const Pattern *p)
     if (panel_has_radii(p)) rows += 2;
     if (p->aim == AIM_FORMATION) rows += 2; /* segments + length */
     else if (p->aim == AIM_SPEAR) rows += 1;
+    rows += 1;                             /* sprite picker */
+    if (panel_has_sprite(p)) rows += 2;    /* sprite size + rotation */
     rows += 3;                             /* colour R/G/B */
     return rows;
 }
@@ -683,6 +732,19 @@ static void draw_panel(void)
         if (slider_f("length", row++, &p->length, 0.0f, 400.0f, 5.0f)) {}
     } else if (p->aim == AIM_SPEAR) {
         if (slider_f("length", row++, &p->length, 0.0f, 400.0f, 5.0f)) reset_preview();
+    }
+
+    /* Bullet look: any png dropped into resources/ can be picked here. */
+    int sprite = sprite_index(p->sprite);
+    if (cycler("sprite", row++, &sprite, sprite_labels, sprite_choice_count)) {
+        snprintf(p->sprite, SPRITE_NAME_MAX, "%s", sprite_choices[sprite]);
+    }
+    if (panel_has_sprite(p)) {
+        if (p->sprite_size <= 0.0f) p->sprite_size = p->radius * 2.0f;
+        if (slider_f("sprite size", row++, &p->sprite_size, 2.0f, 96.0f, 1.0f)) {}
+        static const char *const ROT_LABELS[] = { "upright", "face travel" };
+        int rot = (int)p->sprite_rot;
+        if (cycler("sprite rot", row++, &rot, ROT_LABELS, 2)) p->sprite_rot = (SpriteRot)rot;
     }
 
     int r = p->color.r;
@@ -808,7 +870,9 @@ static int check_file(const char *target)
                   same_float(a.spin, b.spin) && same_float(a.jitter, b.jitter) &&
                   same_float(a.angle, b.angle) &&
                   same_float(a.spawn_radius, b.spawn_radius) && same_float(a.min_radius, b.min_radius) &&
-                  (a.segments == b.segments) && same_float(a.length, b.length);
+                  (a.segments == b.segments) && same_float(a.length, b.length) &&
+                  (strcmp(a.sprite, b.sprite) == 0) &&
+                  same_float(a.sprite_size, b.sprite_size) && (a.sprite_rot == b.sprite_rot);
         if (!ok) {
             printf("pattern %d ('%s') differs from the built-in table\n", i, a.name);
             problems++;
@@ -841,11 +905,12 @@ static int check_layout(void)
     }
 
     /* The tallest column of controls the panel can ever produce, which is a
-       point-origin formation (every optional block shown at once). */
+       point-origin formation with a sprite (every optional block shown at once). */
     Pattern tall = pattern_apply_defaults((Pattern){ 0 });
     tall.name = "tallest";
     tall.origin = ORIGIN_POINT;
     tall.aim = AIM_FORMATION;
+    snprintf(tall.sprite, SPRITE_NAME_MAX, "x");
     int tall_rows = panel_row_count(&tall);
     int tall_bottom = PANEL_Y + tall_rows * PROP_ROW_H;
     if (tall_bottom > WIN_H) {

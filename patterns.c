@@ -18,7 +18,8 @@ const Pattern PATTERNS[] = {
 
     { .name = "ring32", .origin = ORIGIN_POINT, .point = {600, 300},
       .aim = AIM_RADIAL, .count = 32, .spread = 2 * PI, .speed = 220,
-      .delay = 0.2f, .repeat = 24, .spin = 0.2f },
+      .delay = 0.2f, .repeat = 24, .spin = 0.2f,
+      .sprite = "bullet_orb", .sprite_size = 16 },
 
     { .name = "spiral", .origin = ORIGIN_POINT, .point = {600, 300},
       .aim = AIM_ANGLE, .count = 2, .spread = 0, .speed = 360,
@@ -34,7 +35,8 @@ const Pattern PATTERNS[] = {
     { .name = "lattice", .origin = ORIGIN_POINT, .point = {600, 300},
       .aim = AIM_RADIAL, .count = 16, .spread = 2 * PI, .speed = 140,
       .delay = 0.5f, .repeat = 10, .spin = 0.11f, .radius = 12,
-      .color = {120, 200, 255, 255}, .damage = 20 },
+      .color = {120, 200, 255, 255}, .damage = 20,
+      .sprite = "bullet_hex", .sprite_size = 26, .sprite_rot = SPRITE_ROT_TRAVEL },
 
     /* a curtain of bullets with one gap to thread through */
     { .name = "wall_gap", .origin = ORIGIN_TOP, .aim = AIM_WALL,
@@ -64,7 +66,8 @@ const Pattern PATTERNS[] = {
     /* a ring closes in from every side at once */
     { .name = "encircle", .origin = ORIGIN_PLAYER, .aim = AIM_ENCIRCLE,
       .count = 12, .spawn_radius = 260, .speed = 180, .delay = 1.0f,
-      .repeat = 5, .spin = 0.4f, .color = {255, 140, 255, 255}, .damage = 12 },
+      .repeat = 5, .spin = 0.4f, .color = {255, 140, 255, 255}, .damage = 12,
+      .sprite = "bullet_ring", .sprite_size = 18 },
 
     /* 4 arms pinching in from up/down/left/right */
     { .name = "cross_close", .origin = ORIGIN_PLAYER, .aim = AIM_CROSS,
@@ -126,20 +129,22 @@ const Pattern PATTERNS[] = {
     /* a shaft of bullets: one piercing thrust from the side */
     { .name = "spear_thrust", .origin = ORIGIN_LEFT, .aim = AIM_SPEAR,
       .count = 6, .length = 120, .speed = 420, .delay = 0.7f, .repeat = 8,
-      .color = {255, 255, 255, 255}, .damage = 12 },
+      .color = {255, 255, 255, 255}, .damage = 12,
+      .sprite = "bullet_spear", .sprite_size = 26, .sprite_rot = SPRITE_ROT_TRAVEL },
 
     /* the same shaft but pinned at 90 degrees and slowly rotating */
     { .name = "spear_lance", .origin = ORIGIN_POINT, .point = {600, 300},
       .aim = AIM_SPEAR, .count = 8, .length = 160, .speed = 300,
       .delay = 0.5f, .repeat = 12, .spin = D2R(9),
       .has_angle = true, .angle = D2R(90),
-      .color = {150, 200, 255, 255}, .damage = 10 },
+      .color = {150, 200, 255, 255}, .damage = 10,
+      .sprite = "bullet_spear", .sprite_size = 34, .sprite_rot = SPRITE_ROT_TRAVEL },
 
     /* flower: six vertices around the player, each firing a small fan */
     { .name = "formation_flower", .origin = ORIGIN_PLAYER, .aim = AIM_FORMATION,
       .segments = 6, .count = 2, .spread = D2R(20), .length = 140,
       .speed = 200, .delay = 0.9f, .repeat = 6, .spin = D2R(5),
-      .color = {255, 140, 255, 255} },
+      .sprite = "bullet_star", .sprite_size = 18, .color = {255, 140, 255, 255} },
 
     /* pincer: three vertices from the left, converging on the player */
     { .name = "formation_pincer", .origin = ORIGIN_LEFT, .aim = AIM_FORMATION,
@@ -160,5 +165,7 @@ Pattern pattern_apply_defaults(Pattern p)
     if (p.min_radius <= 0)   p.min_radius = 70;
     if (p.segments <= 0)     p.segments = 3;
     if (p.length <= 0)       p.length = 90.0f;
+    if (p.sprite_size <= 0)  p.sprite_size = p.radius * 2.0f;
+    p.sprite[SPRITE_NAME_MAX - 1] = '\0';
     return p;
 }

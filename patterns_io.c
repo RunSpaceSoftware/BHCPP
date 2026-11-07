@@ -282,6 +282,21 @@ int PatternsLoad(const char *path, PatternSet *set, char *err, int errSize)
         } else if (strcmp(key, "length") == 0) {
             ok = parse_float(value, &fv);
             cur.length = fv;
+        } else if (strcmp(key, "sprite") == 0) {
+            /* bare png name in resources/; "none" clears it back to a circle */
+            snprintf(cur.sprite, SPRITE_NAME_MAX, "%s",
+                     (strcmp(value, "none") == 0) ? "" : value);
+        } else if (strcmp(key, "sprite_size") == 0) {
+            ok = parse_float(value, &fv);
+            cur.sprite_size = fv;
+        } else if (strcmp(key, "sprite_rot") == 0) {
+            if (strcmp(value, "none") == 0) {
+                cur.sprite_rot = SPRITE_ROT_NONE;
+            } else if (strcmp(value, "travel") == 0) {
+                cur.sprite_rot = SPRITE_ROT_TRAVEL;
+            } else {
+                ok = false;
+            }
         } else if (strcmp(key, "color") == 0) {
             ok = parse_color(value, &cur.color);
         } else {
@@ -355,6 +370,12 @@ bool PatternsSave(const char *path, const Pattern *list, int count)
         if (p.aim == AIM_SPEAR || p.aim == AIM_FORMATION) {
             if (p.aim == AIM_FORMATION) fprintf(f, "  segments %d\n", p.segments);
             fprintf(f, "  length %g\n", p.length);
+        }
+
+        if (p.sprite[0]) {
+            fprintf(f, "  sprite %s\n", p.sprite);
+            fprintf(f, "  sprite_size %g\n", p.sprite_size);
+            if (p.sprite_rot != SPRITE_ROT_NONE) fprintf(f, "  sprite_rot travel\n");
         }
 
         fprintf(f, "  color %d,%d,%d\n", p.color.r, p.color.g, p.color.b);

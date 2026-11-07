@@ -16,6 +16,9 @@ typedef struct {
     Color color;
     int damage;
     bool dead;        /* set on hit; swept out next update */
+    int sprite;       /* index into the sprite name table, -1 = draw a circle */
+    float sprite_size;/* drawn size in px */
+    unsigned char sprite_rot;   /* SpriteRot */
 } Bullet;
 
 typedef struct {
@@ -38,5 +41,8 @@ Pattern scale_pattern(const Pattern *pat, DiffScale d);
 
 void update_bullets(BulletList *list, float dt, int width, int height);
 void draw_bullets(const BulletList *list);
+
+/* Forget cached bullet sprites so newly added pngs load; clear the list first. */
+void reload_bullet_sprites(void);
 
 #endif

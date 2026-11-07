@@ -28,12 +28,16 @@ typedef struct {
  *     damage 10
  *     radius 6
  *     color 255,255,255  # or: yellow, red, orange, ...
+ *     sprite bullet_orb  # any png in resources/, without ".png"; none = circle
+ *     sprite_size 16     # drawn size in px (default: 2 * radius)
+ *     sprite_rot travel  # upright, or travel to face the flight direction
  *   end
  *
  * Angles (spread, spin, jitter, angle) are in degrees, everything else in
  * game units. Any key may be omitted; missing values fall back to the same
  * defaults the C table uses (damage 10, radius 6, yellow, ...). '#' starts a
- * comment. */
+ * comment. The sprite is only a picture: the hitbox stays the radius, so a
+ * big png does not make a bullet easier to hit or harder to dodge. */
 
 /* Load a file. Returns the number of patterns, or -1 on error (message in
    err). Existing contents of out are replaced. */

@@ -1,7 +1,63 @@
 #include "bullet.h"
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 #define TAU (2.0f * PI)
+
+/* ---------------------------------------------------------- sprite cache */
+/* Bullets carry a small id instead of a name or a texture handle: the list is
+   8192 entries, and headless tools must be able to spawn without a GL context.
+   shortcut: 32 distinct sprites per session, raise MAX_SPRITES when a table
+   outgrows it (past that the extra names draw as circles). */
+#define MAX_SPRITES 32
+
+static char sprite_names[MAX_SPRITES][SPRITE_NAME_MAX];
+static Texture2D sprite_tex[MAX_SPRITES];
+static bool sprite_loaded[MAX_SPRITES];
+static int sprite_count = 0;
+
+/* Registers `name` (bare png name, no extension) and returns its id, -1 if none. */
+static int sprite_id(const char *name)
+{
+    if (!name || !*name) return -1;
+    for (int i = 0; i < sprite_count; i++)
+        if (strcmp(sprite_names[i], name) == 0) return i;
+    if (sprite_count >= MAX_SPRITES) return -1;
+    snprintf(sprite_names[sprite_count], SPRITE_NAME_MAX, "%s", name);
+    return sprite_count++;
+}
+
+/* Loads the png on first use; returns NULL when it is missing. */
+static Texture2D *sprite_texture(int id)
+{
+    if (id < 0 || id >= sprite_count) return NULL;
+    if (!sprite_loaded[id]) {
+        sprite_loaded[id] = true;   /* try once, so a missing png stays cheap */
+        const char *app = GetApplicationDirectory();
+        const char *fmt[3] = { "%sresources/%s.png", "%s../resources/%s.png", "%sresources/%s.png" };
+        char path[4096];
+        for (int i = 0; i < 3 && sprite_tex[id].id == 0; i++) {
+            snprintf(path, sizeof path, fmt[i], (i == 2) ? "" : app, sprite_names[id]);
+            if (!FileExists(path)) continue;
+            sprite_tex[id] = LoadTexture(path);
+            if (sprite_tex[id].id != 0) SetTextureFilter(sprite_tex[id], TEXTURE_FILTER_POINT);
+        }
+    }
+    return sprite_tex[id].id != 0 ? &sprite_tex[id] : NULL;
+}
+
+/* Drop every cached texture so a png added since start-up is picked up.
+   Callers must clear their bullet list first: ids would otherwise dangle. */
+void reload_bullet_sprites(void)
+{
+    for (int i = 0; i < sprite_count; i++) {
+        if (sprite_tex[i].id != 0) UnloadTexture(sprite_tex[i]);
+        sprite_tex[i].id = 0;
+        sprite_loaded[i] = false;
+    }
+    sprite_count = 0;
+}
 
 static float clampf(float v, float lo, float hi)
 {
@@ -27,6 +83,9 @@ static void add_bullet(BulletList *list, const Pattern *p, float x, float y, flo
     b->color = p->color;
     b->damage = p->damage;
     b->dead = false;
+    b->sprite = sprite_id(p->sprite);
+    b->sprite_size = p->sprite_size;
+    b->sprite_rot = (unsigned char)p->sprite_rot;
 }
 
 static void edge_point(int width, int height, float *x, float *y)
@@ -362,6 +421,19 @@ void draw_bullets(const BulletList *list)
 {
     for (int i = 0; i < list->count; i++) {
         const Bullet *b = &list->items[i];
-        DrawCircleV((Vector2){ b->x, b->y }, b->radius, b->color);
+        Texture2D *tex = sprite_texture(b->sprite);
+        if (!tex) {
+            /* no png (or none chosen): the circle stays the fallback and the hitbox */
+            DrawCircleV((Vector2){ b->x, b->y }, b->radius, b->color);
+            continue;
+        }
+        float size = b->sprite_size > 0.0f ? b->sprite_size : b->radius * 2.0f;
+        float rot = (b->sprite_rot == SPRITE_ROT_TRAVEL) ? atan2f(b->vy, b->vx) * RAD2DEG : 0.0f;
+        /* fit the longer side to `size` so a non-square png is not squashed */
+        float k = size / (float)(tex->width > tex->height ? tex->width : tex->height);
+        float dw = tex->width * k, dh = tex->height * k;
+        Rectangle src = { 0.0f, 0.0f, (float)tex->width, (float)tex->height };
+        Rectangle dst = { b->x, b->y, dw, dh };
+        DrawTexturePro(*tex, src, dst, (Vector2){ dw * 0.5f, dh * 0.5f }, rot, WHITE);
     }
 }

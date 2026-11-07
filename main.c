@@ -372,7 +372,8 @@ int main(void)
         if (IsKeyPressed(KEY_F5)) {
             patterns = PatternsGet(&pattern_count);
             if (pattern_count <= 0) pattern_count = 1;
-            reset_run();
+            reset_run();          /* clears bullets, so sprite ids are safe to drop */
+            reload_bullet_sprites();
             state = STATE_MENU;
         }
 

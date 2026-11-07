@@ -42,6 +42,8 @@ pattern ring32
   damage 10
   radius 6
   spin 11.4592
+  sprite bullet_orb
+  sprite_size 16
   color 253,249,0
 end
 
@@ -90,6 +92,9 @@ pattern lattice
   damage 20
   radius 12
   spin 6.30254
+  sprite bullet_hex
+  sprite_size 26
+  sprite_rot travel
   color 120,200,255
 end
 
@@ -177,6 +182,8 @@ pattern encircle
   spin 22.9183
   spawn_radius 260
   min_radius 70
+  sprite bullet_ring
+  sprite_size 18
   color 255,140,255
 end
 
@@ -383,6 +390,9 @@ pattern spear_thrust
   damage 12
   radius 6
   length 120
+  sprite bullet_spear
+  sprite_size 26
+  sprite_rot travel
   color 255,255,255
 end
 
@@ -401,6 +411,9 @@ pattern spear_lance
   spin 9
   angle 90
   length 160
+  sprite bullet_spear
+  sprite_size 34
+  sprite_rot travel
   color 150,200,255
 end
 
@@ -417,6 +430,8 @@ pattern formation_flower
   spin 5
   segments 6
   length 140
+  sprite bullet_star
+  sprite_size 18
   color 255,140,255
 end
 
@@ -434,3 +449,4 @@ pattern formation_pincer
   length 100
   color 120,240,255
 end
+
