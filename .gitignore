@@ -1,0 +1,15 @@
+# Executables
+*.exe
+
+# Object files
+*.o
+
+# VS Code settings folder
+.vscode/
+
+# Your custom folder (I assume you meant .dsh)
+.dsh/
+
+# Resource files
+*.rc
+game.rc.data

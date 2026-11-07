@@ -1,0 +1,436 @@
+# Bullet Hell pattern data
+# Written by tools/pattern_editor - you can also edit this by hand.
+# Angles (spread/spin/jitter/angle) are in degrees; '#' starts a comment.
+# Any key may be left out - the game then uses its built-in default.
+
+pattern single_aimed
+  origin edge
+  aim player
+  count 1
+  spread 0
+  speed 300
+  delay 0.15
+  repeat 20
+  damage 10
+  radius 6
+  color 253,249,0
+end
+
+pattern fan5_aimed
+  origin edge
+  aim player
+  count 9
+  spread 40
+  speed 280
+  delay 0.4
+  repeat 8
+  damage 10
+  radius 6
+  color 253,249,0
+end
+
+pattern ring32
+  origin point
+  aim radial
+  x 600
+  y 300
+  count 32
+  spread 360
+  speed 220
+  delay 0.2
+  repeat 24
+  damage 10
+  radius 6
+  spin 11.4592
+  color 253,249,0
+end
+
+pattern spiral
+  origin point
+  aim angle
+  x 600
+  y 300
+  count 2
+  spread 0
+  speed 360
+  delay 0.04
+  repeat 192
+  damage 10
+  radius 6
+  spin 74.4845
+  color 253,249,0
+end
+
+pattern spiral_double
+  origin point
+  aim angle
+  x 600
+  y 300
+  count 4
+  spread 0
+  speed 300
+  delay 0.05
+  repeat 150
+  damage 10
+  radius 6
+  spin -40.107
+  color 255,165,0
+end
+
+pattern lattice
+  origin point
+  aim radial
+  x 600
+  y 300
+  count 16
+  spread 360
+  speed 140
+  delay 0.5
+  repeat 10
+  damage 20
+  radius 12
+  spin 6.30254
+  color 120,200,255
+end
+
+pattern wall_gap
+  origin top
+  aim wall
+  side top
+  count 18
+  spread 0
+  speed 260
+  delay 0.9
+  repeat 8
+  damage 8
+  radius 6
+  gap random
+  color 200,120,255
+end
+
+pattern wall_solid
+  origin left
+  aim wall
+  side left
+  count 22
+  spread 0
+  speed 200
+  delay 1.1
+  repeat 6
+  damage 12
+  radius 6
+  gap random
+  color 255,120,120
+end
+
+pattern rain
+  origin bottom
+  aim rain
+  count 6
+  spread 0
+  speed 250
+  delay 0.2
+  repeat 30
+  damage 10
+  radius 6
+  jitter 18
+  color 150,255,150
+end
+
+pattern crossfire
+  origin left
+  aim crossfire
+  count 2
+  spread 0
+  speed 320
+  delay 0.45
+  repeat 14
+  damage 8
+  radius 6
+  color 255,220,120
+end
+
+pattern aimed_jitter
+  origin edge
+  aim player
+  count 3
+  spread 12
+  speed 380
+  delay 0.25
+  repeat 18
+  damage 15
+  radius 6
+  jitter 6
+  color 255,90,90
+end
+
+pattern encircle
+  origin player
+  aim encircle
+  count 12
+  spread 0
+  speed 180
+  delay 1
+  repeat 5
+  damage 12
+  radius 6
+  spin 22.9183
+  spawn_radius 260
+  min_radius 70
+  color 255,140,255
+end
+
+pattern cross_close
+  origin player
+  aim cross
+  count 4
+  spread 0
+  speed 240
+  delay 0.55
+  repeat 8
+  damage 8
+  radius 6
+  spin 45
+  spawn_radius 280
+  min_radius 70
+  color 120,240,255
+end
+
+pattern rain_down
+  origin top
+  aim rain
+  count 7
+  spread 0
+  speed 260
+  delay 0.2
+  repeat 30
+  damage 8
+  radius 6
+  jitter 14
+  color 120,200,255
+end
+
+pattern rain_side
+  origin left
+  aim rain
+  count 5
+  spread 0
+  speed 280
+  delay 0.2
+  repeat 30
+  damage 8
+  radius 6
+  jitter 12
+  color 255,200,120
+end
+
+pattern wall_bottom_gap
+  origin bottom
+  aim wall
+  side bottom
+  count 20
+  spread 0
+  speed 240
+  delay 0.9
+  repeat 8
+  damage 8
+  radius 6
+  gap random
+  color 255,160,90
+end
+
+pattern wall_right_gap
+  origin right
+  aim wall
+  side right
+  count 12
+  spread 0
+  speed 250
+  delay 0.9
+  repeat 8
+  damage 8
+  radius 6
+  gap random
+  color 160,255,200
+end
+
+pattern fan_bottom
+  origin bottom
+  aim player
+  count 7
+  spread 50
+  speed 270
+  delay 0.45
+  repeat 10
+  damage 8
+  radius 6
+  color 255,220,120
+end
+
+pattern burst_right
+  origin right
+  aim player
+  count 5
+  spread 25
+  speed 330
+  delay 0.3
+  repeat 14
+  damage 10
+  radius 6
+  jitter 3
+  color 255,120,180
+end
+
+pattern bottom_volley
+  origin bottom
+  aim angle
+  count 1
+  spread 0
+  speed 300
+  delay 0.08
+  repeat 50
+  damage 8
+  radius 6
+  color 255,255,160
+end
+
+pattern ring_left
+  origin point
+  aim radial
+  x 300
+  y 300
+  count 20
+  spread 360
+  speed 200
+  delay 0.35
+  repeat 10
+  damage 8
+  radius 6
+  spin 8.59437
+  color 255,150,200
+end
+
+pattern ring_right
+  origin point
+  aim radial
+  x 900
+  y 300
+  count 20
+  spread 360
+  speed 200
+  delay 0.35
+  repeat 10
+  damage 8
+  radius 6
+  spin -8.59437
+  color 150,200,255
+end
+
+pattern spiral_triple
+  origin point
+  aim angle
+  x 600
+  y 300
+  count 3
+  spread 0
+  speed 280
+  delay 0.06
+  repeat 120
+  damage 8
+  radius 6
+  spin 51.5662
+  color 180,255,150
+end
+
+pattern encircle_gap
+  origin player
+  aim encircle
+  count 16
+  spread 0
+  speed 200
+  delay 0.8
+  repeat 6
+  damage 10
+  radius 6
+  spin 17.1887
+  gap random
+  spawn_radius 240
+  min_radius 70
+  color 255,180,255
+end
+
+pattern crossfire_fast
+  origin left
+  aim crossfire
+  count 2
+  spread 0
+  speed 400
+  delay 0.35
+  repeat 16
+  damage 8
+  radius 6
+  color 255,240,140
+end
+
+pattern spear_thrust
+  origin left
+  aim spear
+  count 6
+  spread 0
+  speed 420
+  delay 0.7
+  repeat 8
+  damage 12
+  radius 6
+  length 120
+  color 255,255,255
+end
+
+pattern spear_lance
+  origin point
+  aim spear
+  x 600
+  y 300
+  count 8
+  spread 0
+  speed 300
+  delay 0.5
+  repeat 12
+  damage 10
+  radius 6
+  spin 9
+  angle 90
+  length 160
+  color 150,200,255
+end
+
+pattern formation_flower
+  origin player
+  aim formation
+  count 2
+  spread 20
+  speed 200
+  delay 0.9
+  repeat 6
+  damage 10
+  radius 6
+  spin 5
+  segments 6
+  length 140
+  color 255,140,255
+end
+
+pattern formation_pincer
+  origin left
+  aim formation
+  count 3
+  spread 18
+  speed 260
+  delay 0.8
+  repeat 8
+  damage 10
+  radius 6
+  segments 3
+  length 100
+  color 120,240,255
+end
