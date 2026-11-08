@@ -450,3 +450,68 @@ pattern formation_pincer
   color 120,240,255
 end
 
+pattern cannon_lob
+  origin top
+  aim angle
+  count 3
+  spread 14
+  speed 360
+  delay 0.9
+  repeat 8
+  damage 12
+  radius 6
+  angle 70
+  sprite bullet_orb
+  sprite_size 16
+  gravity 520
+  color 255,170,90
+end
+
+pattern cannon_drop
+  origin top
+  aim rain
+  count 5
+  spread 0
+  speed 120
+  delay 0.7
+  repeat 10
+  damage 10
+  radius 6
+  jitter 10
+  sprite bullet_hex
+  sprite_size 18
+  gravity 420
+  color 255,120,120
+end
+
+pattern alternate_walls
+  origin left
+  aim alternate
+  count 14
+  spread 0
+  speed 260
+  delay 0.85
+  repeat 10
+  damage 10
+  radius 6
+  gap random
+  color 120,240,255
+end
+
+pattern script_mortar
+  origin top
+  aim angle
+  count 5
+  spread 0
+  speed 420
+  delay 0.8
+  repeat 12
+  damage 10
+  radius 6
+  sprite bullet_star
+  sprite_size 16
+  gravity 560
+  script cannon
+  color 255,220,120
+end
+

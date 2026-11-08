@@ -162,6 +162,7 @@ static void reset_run(void)
     shots_left = active[0].repeat;
     shot_timer = 0.0f;
     spin_state.angle = 0.0f;
+    spin_state.shot = 0;
     pos_x = width / 2;
     pos_y = height / 2;
 }
@@ -302,6 +303,7 @@ static void update_play(float dt)
                     pattern_index = (pattern_index + 1) % pattern_count;
                     shots_left = active[pattern_index].repeat;
                     spin_state.angle = 0.0f;
+                    spin_state.shot = 0;
                 }
             }
         }

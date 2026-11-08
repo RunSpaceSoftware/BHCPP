@@ -288,6 +288,93 @@ static void test_sprite_ids(void)
     check(a.items[0].sprite == -1, "no sprite means the circle fallback");
 }
 
+/* gravity: a shell fired level must speed up downward and leave the bottom */
+static void test_gravity(void)
+{
+    printf("gravity shells:\n");
+    Pattern p = pattern_apply_defaults((Pattern){ 0 });
+    p.origin = ORIGIN_TOP;
+    p.aim = AIM_ANGLE;
+    p.has_angle = true;
+    p.angle = 0.0f;          /* fired level: only gravity can move it down */
+    p.count = 1;
+    p.speed = 100;
+    p.gravity = 400;
+
+    BulletList list;
+    list.count = 0;
+    SpinState spin = { 0 };
+    spawn_from_pattern(&list, &p, BASE_W, BASE_H, 600, 300, &spin);
+    check(list.count == 1, "a gravity shot still spawns");
+    check(near(list.items[0].vy, 0.0f, 1e-3f), "fired level, so it starts level");
+
+    for (int i = 0; i < 10; i++) update_bullets(&list, 0.1f, BASE_W, BASE_H);
+    check(list.count == 1 && list.items[0].vy > 100.0f, "gravity keeps speeding it downward");
+
+    int steps = 0;
+    while (list.count > 0 && steps < 200) {
+        update_bullets(&list, 0.1f, BASE_W, BASE_H);
+        steps++;
+    }
+    check(list.count == 0, "a shell that falls past the bottom is culled");
+}
+
+/* alternating walls: same shot, opposite side, every other shot */
+static void test_alternate(void)
+{
+    printf("alternating wall:\n");
+    Pattern p = pattern_apply_defaults((Pattern){ 0 });
+    p.aim = AIM_ALTERNATE;
+    p.count = 5;
+    p.speed = 200;
+
+    BulletList a, b;
+    a.count = 0;
+    b.count = 0;
+    SpinState spin = { 0 };
+    spawn_from_pattern(&a, &p, BASE_W, BASE_H, 600, 300, &spin);
+    spawn_from_pattern(&b, &p, BASE_W, BASE_H, 600, 300, &spin);
+
+    check(a.count == 5 && b.count == 5, "both shots fire the full wall");
+    check(spin.shot == 2, "the shot counter advances per shot");
+    check(a.items[0].x < BASE_W / 2.0f && b.items[0].x > BASE_W / 2.0f,
+          "the wall alternates sides");
+}
+
+/* lua scripts: resources/scripts/<name>.lua decides the bullets */
+static void test_script(void)
+{
+    printf("lua scripts:\n");
+    Pattern p = pattern_apply_defaults((Pattern){ 0 });
+    p.aim = AIM_ANGLE;
+    p.count = 5;
+    p.speed = 300;
+    p.spread = 20.0f * (PI / 180.0f);
+    p.gravity = 500;
+    snprintf(p.script, SCRIPT_NAME_MAX, "cannon");
+
+    BulletList list;
+    list.count = 0;
+    SpinState spin = { 0 };
+    spawn_from_pattern(&list, &p, BASE_W, BASE_H, 600, 300, &spin);
+    check(list.count == 5, "the cannon script produced its shells");
+    check(list.items[0].gravity == 500.0f, "scripted bullets keep the pattern gravity");
+
+    bool finite = true;
+    for (int i = 0; i < list.count; i++)
+        if (!isfinite(list.items[i].x) || !isfinite(list.items[i].y) ||
+            !isfinite(list.items[i].vx) || !isfinite(list.items[i].vy)) finite = false;
+    check(finite, "scripted bullets are finite");
+
+    /* a bad script name must warn and spawn nothing, never crash */
+    Pattern missing = p;
+    snprintf(missing.script, SCRIPT_NAME_MAX, "no_such_script_here");
+    BulletList none;
+    none.count = 0;
+    spawn_from_pattern(&none, &missing, BASE_W, BASE_H, 600, 300, &spin);
+    check(none.count == 0, "a missing script spawns nothing");
+}
+
 int main(void)
 {
     printf("shape tests\n===========\n");
@@ -297,6 +384,9 @@ int main(void)
     test_formation_static();
     test_all_patterns();
     test_sprite_ids();
+    test_gravity();
+    test_alternate();
+    test_script();
 
     printf("\n%s (%d failure%s)\n",
            failures ? "FAILED" : "all good", failures, failures == 1 ? "" : "s");

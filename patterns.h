@@ -26,7 +26,8 @@ typedef enum {
     AIM_ENCIRCLE,      /* ring around the player, all converging inward */
     AIM_CROSS,         /* bullets around the player on 4 sides, converging */
     AIM_SPEAR,         /* long narrow piercing shot */
-    AIM_FORMATION      /* complex geometric grouping */
+    AIM_FORMATION,     /* complex geometric grouping */
+    AIM_ALTERNATE      /* wall that flips between opposite sides each shot */
 } Aim;
 
 typedef enum { SIDE_TOP = 0, SIDE_BOTTOM, SIDE_LEFT, SIDE_RIGHT } Side;
@@ -40,6 +41,7 @@ typedef enum { SIDE_TOP = 0, SIDE_BOTTOM, SIDE_LEFT, SIDE_RIGHT } Side;
 #define DEFAULT_RADIUS 6.0f
 
 #define SPRITE_NAME_MAX 64
+#define SCRIPT_NAME_MAX 32
 
 /* How a bullet sprite is turned when drawn. */
 typedef enum {
@@ -73,6 +75,8 @@ typedef struct {
     char sprite[SPRITE_NAME_MAX]; /* png in resources/, "" = draw a circle */
     float sprite_size;      /* drawn size in px (default: 2*radius) */
     SpriteRot sprite_rot;   /* how the sprite is turned when drawn */
+    float gravity;          /* px/s^2 pulling the bullet down (0 = straight) */
+    char script[SCRIPT_NAME_MAX]; /* lua file in resources/scripts, "" = none */
 } Pattern;
 
 #define MAX_PATTERNS 64

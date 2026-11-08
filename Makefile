@@ -273,7 +273,7 @@ endif
 
 # Define include paths for required headers
 # NOTE: Several external required libraries (stb and others)
-INCLUDE_PATHS = -I. -I$(RAYLIB_PATH)/src -I$(RAYLIB_PATH)/src/external
+INCLUDE_PATHS = -I. -I$(RAYLIB_PATH)/src -I$(RAYLIB_PATH)/src/external -Ithird_party/lua
 
 # Define additional directories containing required header files
 ifeq ($(PLATFORM),PLATFORM_RPI)
@@ -377,7 +377,10 @@ OBJ_DIR = obj
 
 # Define all object files from source files
 # NOTE: tools/ holds separate programs (the pattern editor), never the game
-SRC = $(filter-out ./tools/%, $(call rwildcard, ./, *.c, *.h))
+# NOTE: lua.c/luac.c are standalone interpreters with their own main()
+LUA_DIR = third_party/lua
+LUA_SRC = $(filter-out $(LUA_DIR)/lua.c $(LUA_DIR)/luac.c, $(wildcard $(LUA_DIR)/*.c))
+SRC = $(filter-out ./tools/% ./$(LUA_DIR)/lua.c ./$(LUA_DIR)/luac.c, $(call rwildcard, ./, *.c, *.h))
 #OBJS = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 override OBJS = $(filter %.c,$(SRC))
 
@@ -411,7 +414,7 @@ endif
 # the game reads at start-up). It is not part of the game binary.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP editor
 #   run:   tools/pattern_editor.exe
-EDITOR_SRC = tools/pattern_editor.c bullet.c patterns.c patterns_io.c platform_compat.c
+EDITOR_SRC = tools/pattern_editor.c bullet.c patterns.c patterns_io.c pattern_script.c platform_compat.c $(LUA_SRC)
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 editor: $(EDITOR_SRC) $(WIN_RES)
 	$(CC) -o tools/pattern_editor$(EXT) $(EDITOR_SRC) $(WIN_RES) $(WIN_LDFLAGS) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
@@ -427,7 +430,7 @@ endif
 # and formation spawn code. No window is created, so it runs anywhere.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest
 #   run:   tools/shape_test.exe
-SHAPETEST_SRC = tools/shape_test.c bullet.c patterns.c patterns_io.c platform_compat.c
+SHAPETEST_SRC = tools/shape_test.c bullet.c patterns.c patterns_io.c pattern_script.c platform_compat.c $(LUA_SRC)
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 shapetest: $(SHAPETEST_SRC) $(WIN_RES)
 	$(CC) -o tools/shape_test$(EXT) $(SHAPETEST_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)

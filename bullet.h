@@ -16,6 +16,7 @@ typedef struct {
     Color color;
     int damage;
     bool dead;        /* set on hit; swept out next update */
+    float gravity;    /* px/s^2 added to vy, so shells arc downward */
     int sprite;       /* index into the sprite name table, -1 = draw a circle */
     float sprite_size;/* drawn size in px */
     unsigned char sprite_rot;   /* SpriteRot */
@@ -26,8 +27,8 @@ typedef struct {
     int count;
 } BulletList;
 
-/* Spinning patterns keep their running angle here. */
-typedef struct { float angle; } SpinState;
+/* Per-pattern running state: the spin angle and how many shots have fired. */
+typedef struct { float angle; int shot; } SpinState;
 
 /* Difficulty multipliers (1.0 = unchanged). */
 typedef struct { float speed, count, damage; } DiffScale;

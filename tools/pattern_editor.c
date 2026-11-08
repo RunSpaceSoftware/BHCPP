@@ -36,7 +36,7 @@
 #include <string.h>
 
 #define WIN_W 1500
-#define WIN_H 820
+#define WIN_H 880
 #define ARENA_W 1200
 #define ARENA_H 600
 
@@ -96,6 +96,11 @@ static char        sprite_choices[MAX_SPRITE_CHOICES][SPRITE_NAME_MAX];
 static const char *sprite_labels[MAX_SPRITE_CHOICES];
 static int         sprite_choice_count = 1;
 
+/* lua files found in the resources folder, entry 0 = "" (no script) */
+static char        script_choices[MAX_SPRITE_CHOICES][SCRIPT_NAME_MAX];
+static const char *script_labels[MAX_SPRITE_CHOICES];
+static int         script_choice_count = 1;
+
 /* --------------------------------------------------------------- helpers */
 static void say(const char *text)
 {
@@ -126,6 +131,7 @@ static void reset_preview(void)
 {
     bullets.count = 0;
     spin.angle = 0.0f;
+    spin.shot = 0;
     shot_timer = 0.0f;
     shots_fired = 0;
 }
@@ -172,6 +178,39 @@ static int sprite_index(const char *name)
         snprintf(sprite_choices[sprite_choice_count], SPRITE_NAME_MAX, "%s", name);
         sprite_labels[sprite_choice_count] = sprite_choices[sprite_choice_count];
         return sprite_choice_count++;
+    }
+    return 0;
+}
+
+/* Pattern scripts: every .lua in <resources>/scripts, entry 0 = no script. */
+static void scan_scripts(void)
+{
+    script_choice_count = 1;
+    snprintf(script_choices[0], SCRIPT_NAME_MAX, "%s", "");
+    script_labels[0] = "(none)";
+
+    char dir[4096];
+    snprintf(dir, sizeof dir, "%s/scripts", GetDirectoryPath(path));
+    FilePathList files = LoadDirectoryFilesEx(dir, ".lua", false);
+    for (unsigned i = 0; i < files.count && script_choice_count < MAX_SPRITE_CHOICES; i++) {
+        const char *base = GetFileNameWithoutExt(files.paths[i]);  /* static buffer: copy now */
+        if (!base || !*base) continue;
+        snprintf(script_choices[script_choice_count], SCRIPT_NAME_MAX, "%s", base);
+        script_labels[script_choice_count] = script_choices[script_choice_count];
+        script_choice_count++;
+    }
+    UnloadDirectoryFiles(files);
+}
+
+static int script_index(const char *name)
+{
+    if (!name || !*name) return 0;
+    for (int i = 1; i < script_choice_count; i++)
+        if (strcmp(script_choices[i], name) == 0) return i;
+    if (script_choice_count < MAX_SPRITE_CHOICES) {
+        snprintf(script_choices[script_choice_count], SCRIPT_NAME_MAX, "%s", name);
+        script_labels[script_choice_count] = script_choices[script_choice_count];
+        return script_choice_count++;
     }
     return 0;
 }
@@ -227,6 +266,7 @@ static void load_initial(const char *arg)
     fix_names();
     resolve_path(arg);
     scan_sprites();
+    scan_scripts();
     sel = 0;
     reset_preview();
 }
@@ -256,6 +296,7 @@ static void do_reload(void)
         if (sel >= count) sel = count - 1;
         reset_preview();
         scan_sprites();              /* picks up pngs dropped in since start-up */
+        scan_scripts();
         reload_bullet_sprites();     /* reset_preview() cleared the bullets above */
         say("reloaded from disk");
     } else {
@@ -365,8 +406,8 @@ static bool slider_i(const char *label, int index, int *value, int lo, int hi)
 }
 
 static const char *const ORIGIN_LABELS[] = { "edge", "top", "bottom", "left", "right", "point", "player" };
-static const char *const AIM_LABELS[] = { "player", "angle", "radial", "wall", "rain", "crossfire", "encircle", "cross", "spear", "formation" };
-#define AIM_LABEL_COUNT 10
+static const char *const AIM_LABELS[] = { "player", "angle", "radial", "wall", "rain", "crossfire", "encircle", "cross", "spear", "formation", "alternate" };
+#define AIM_LABEL_COUNT 11
 static const char *const SIDE_LABELS[] = { "top", "bottom", "left", "right" };
 
 /* Cyclic choice with clickable < > zones. */
@@ -640,7 +681,8 @@ static bool panel_has_side(const Pattern *p)  { return p->aim == AIM_WALL; }
 static bool panel_has_point(const Pattern *p) { return p->origin == ORIGIN_POINT; }
 static bool panel_has_gap(const Pattern *p)
 {
-    return p->aim == AIM_WALL || p->aim == AIM_ENCIRCLE || p->aim == AIM_CROSS;
+    return p->aim == AIM_WALL || p->aim == AIM_ALTERNATE ||
+           p->aim == AIM_ENCIRCLE || p->aim == AIM_CROSS;
 }
 static bool panel_has_radii(const Pattern *p)
 {
@@ -664,6 +706,8 @@ static int panel_row_count(const Pattern *p)
     else if (p->aim == AIM_SPEAR) rows += 1;
     rows += 1;                             /* sprite picker */
     if (panel_has_sprite(p)) rows += 2;    /* sprite size + rotation */
+    rows += 1;                             /* gravity */
+    rows += 1;                             /* script */
     rows += 3;                             /* colour R/G/B */
     return rows;
 }
@@ -745,6 +789,15 @@ static void draw_panel(void)
         static const char *const ROT_LABELS[] = { "upright", "face travel" };
         int rot = (int)p->sprite_rot;
         if (cycler("sprite rot", row++, &rot, ROT_LABELS, 2)) p->sprite_rot = (SpriteRot)rot;
+    }
+
+    /* gravity turns a straight shot into a lobbed shell */
+    if (slider_f("gravity", row++, &p->gravity, 0.0f, 1200.0f, 10.0f)) {}
+
+    /* a lua script in resources/scripts can replace the built-in spawn logic */
+    int script = script_index(p->script);
+    if (cycler("script", row++, &script, script_labels, script_choice_count)) {
+        snprintf(p->script, SCRIPT_NAME_MAX, "%s", script_choices[script]);
     }
 
     int r = p->color.r;
@@ -872,7 +925,8 @@ static int check_file(const char *target)
                   same_float(a.spawn_radius, b.spawn_radius) && same_float(a.min_radius, b.min_radius) &&
                   (a.segments == b.segments) && same_float(a.length, b.length) &&
                   (strcmp(a.sprite, b.sprite) == 0) &&
-                  same_float(a.sprite_size, b.sprite_size) && (a.sprite_rot == b.sprite_rot);
+                  same_float(a.sprite_size, b.sprite_size) && (a.sprite_rot == b.sprite_rot) &&
+                  same_float(a.gravity, b.gravity) && (strcmp(a.script, b.script) == 0);
         if (!ok) {
             printf("pattern %d ('%s') differs from the built-in table\n", i, a.name);
             problems++;

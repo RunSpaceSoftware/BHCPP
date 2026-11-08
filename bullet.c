@@ -1,4 +1,5 @@
 #include "bullet.h"
+#include "pattern_script.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -71,21 +72,28 @@ static float rand_range(float a, float b)
     return a + (b - a) * ((float)GetRandomValue(0, 100000) / 100000.0f);
 }
 
-static void add_bullet(BulletList *list, const Pattern *p, float x, float y, float angle)
+static void add_bullet_at(BulletList *list, const Pattern *p, float x, float y,
+                          float angle, float speed)
 {
     if (list->count >= MAX_BULLETS) return;
     Bullet *b = &list->items[list->count++];
     b->x = x;
     b->y = y;
-    b->vx = cosf(angle) * p->speed;
-    b->vy = sinf(angle) * p->speed;
+    b->vx = cosf(angle) * speed;
+    b->vy = sinf(angle) * speed;
     b->radius = p->radius;
     b->color = p->color;
     b->damage = p->damage;
     b->dead = false;
+    b->gravity = p->gravity;
     b->sprite = sprite_id(p->sprite);
     b->sprite_size = p->sprite_size;
     b->sprite_rot = (unsigned char)p->sprite_rot;
+}
+
+static void add_bullet(BulletList *list, const Pattern *p, float x, float y, float angle)
+{
+    add_bullet_at(list, p, x, y, angle, p->speed);
 }
 
 static void edge_point(int width, int height, float *x, float *y)
@@ -325,9 +333,21 @@ static void spawn_formation(BulletList *list, const Pattern *p, int width, int h
     }
 }
 
-void spawn_from_pattern(BulletList *list, const Pattern *p, int width, int height,
-                        float player_x, float player_y, SpinState *spin)
+static void spawn_one(BulletList *list, const Pattern *p, int width, int height,
+                      float player_x, float player_y, SpinState *spin)
 {
+    /* a lua script owns the whole shot when the pattern names one */
+    if (p->script[0]) {
+        ShotSpec specs[MAX_SCRIPT_SHOTS];
+        char err[256] = { 0 };
+        int shots = ScriptSpawn(p, width, height, player_x, player_y, spin->shot,
+                                specs, MAX_SCRIPT_SHOTS, err, sizeof err);
+        if (shots < 0) TraceLog(LOG_WARNING, "SCRIPT: %s", err);
+        for (int i = 0; i < shots; i++)
+            add_bullet_at(list, p, specs[i].x, specs[i].y, specs[i].angle * DEG2RAD, specs[i].speed);
+        return;
+    }
+
     switch (p->aim) {
         case AIM_WALL:      spawn_wall(list, p, width, height); return;
         case AIM_RAIN:      spawn_rain(list, p, width, height); return;
@@ -336,6 +356,13 @@ void spawn_from_pattern(BulletList *list, const Pattern *p, int width, int heigh
         case AIM_CROSS:     spawn_ring_in(list, p, width, height, player_x, player_y, spin); return;
         case AIM_SPEAR:     spawn_spear(list, p, width, height, player_x, player_y, spin); return;
         case AIM_FORMATION: spawn_formation(list, p, width, height, player_x, player_y, spin); return;
+        case AIM_ALTERNATE: {
+            /* same wall, other side, every other shot */
+            Pattern alt = *p;
+            alt.side = (spin->shot & 1) ? SIDE_RIGHT : SIDE_LEFT;
+            spawn_wall(list, &alt, width, height);
+            return;
+        }
         default: break;
     }
 
@@ -374,6 +401,13 @@ void spawn_from_pattern(BulletList *list, const Pattern *p, int width, int heigh
     }
 }
 
+void spawn_from_pattern(BulletList *list, const Pattern *p, int width, int height,
+                        float player_x, float player_y, SpinState *spin)
+{
+    spawn_one(list, p, width, height, player_x, player_y, spin);
+    spin->shot++;   /* alternating aim and scripts count shots */
+}
+
 Pattern scale_pattern(const Pattern *pat, DiffScale d)
 {
     /* "More bullets" = a bigger count where that keeps the shape sensible
@@ -406,6 +440,7 @@ void update_bullets(BulletList *list, float dt, int width, int height)
         Bullet *b = &list->items[i];
         b->x += b->vx * dt;
         b->y += b->vy * dt;
+        b->vy += b->gravity * dt;
         const int m = 50;
         bool off = b->x < -m || b->x > width + m || b->y < -m || b->y > height + m;
         if (b->dead || off) {

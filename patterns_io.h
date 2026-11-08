@@ -31,13 +31,20 @@ typedef struct {
  *     sprite bullet_orb  # any png in resources/, without ".png"; none = circle
  *     sprite_size 16     # drawn size in px (default: 2 * radius)
  *     sprite_rot travel  # upright, or travel to face the flight direction
+ *     gravity 520        # px/s^2 downward, so a shot arcs like a shell
+ *     script cannon      # lua in resources/scripts, replaces the spawn logic
  *   end
  *
  * Angles (spread, spin, jitter, angle) are in degrees, everything else in
  * game units. Any key may be omitted; missing values fall back to the same
  * defaults the C table uses (damage 10, radius 6, yellow, ...). '#' starts a
  * comment. The sprite is only a picture: the hitbox stays the radius, so a
- * big png does not make a bullet easier to hit or harder to dodge. */
+ * big png does not make a bullet easier to hit or harder to dodge.
+ *
+ * A script owns the whole shot. It defines spawn(ctx), where ctx carries
+ * width, height, player_x, player_y, shot, count, spread, speed, radius and
+ * gravity, and returns a table of {x=,y=,angle=,speed=} bullets with angles in
+ * degrees. Radius, damage, colour and sprite still come from the pattern. */
 
 /* Load a file. Returns the number of patterns, or -1 on error (message in
    err). Existing contents of out are replaced. */

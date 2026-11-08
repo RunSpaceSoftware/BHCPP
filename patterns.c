@@ -151,6 +151,31 @@ const Pattern PATTERNS[] = {
       .segments = 3, .count = 3, .spread = D2R(18), .length = 100,
       .speed = 260, .delay = 0.8f, .repeat = 8,
       .color = {120, 240, 255, 255} },
+
+    /* ---- gravity shots: shells that arc and fall to the bottom ---- */
+    { .name = "cannon_lob", .origin = ORIGIN_TOP, .aim = AIM_ANGLE,
+      .count = 3, .spread = D2R(14), .speed = 360, .delay = 0.9f, .repeat = 8,
+      .has_angle = true, .angle = D2R(70), .gravity = 520,
+      .sprite = "bullet_orb", .sprite_size = 16,
+      .color = {255, 170, 90, 255}, .damage = 12 },
+
+    /* dropped straight down, speeding up as it falls */
+    { .name = "cannon_drop", .origin = ORIGIN_TOP, .aim = AIM_RAIN,
+      .count = 5, .jitter = D2R(10), .speed = 120, .delay = 0.7f, .repeat = 10,
+      .gravity = 420, .sprite = "bullet_hex", .sprite_size = 18,
+      .color = {255, 120, 120, 255} },
+
+    /* the same wall from the other side, every other shot */
+    { .name = "alternate_walls", .origin = ORIGIN_LEFT, .aim = AIM_ALTERNATE,
+      .count = 14, .gap = GAP_RANDOM, .speed = 260,
+      .delay = 0.85f, .repeat = 10, .color = {120, 240, 255, 255}, .damage = 10 },
+
+    /* everything decided by resources/scripts/cannon.lua */
+    { .name = "script_mortar", .origin = ORIGIN_TOP, .aim = AIM_ANGLE,
+      .count = 5, .speed = 420, .delay = 0.8f, .repeat = 12,
+      .gravity = 560, .script = "cannon",
+      .sprite = "bullet_star", .sprite_size = 16,
+      .color = {255, 220, 120, 255} },
 };
 
 const int PATTERN_COUNT = (int)(sizeof(PATTERNS) / sizeof(PATTERNS[0]));

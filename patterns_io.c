@@ -14,7 +14,8 @@ static const char *const ORIGIN_NAMES[] = {
     "edge", "top", "bottom", "left", "right", "point", "player"
 };
 static const char *const AIM_NAMES[] = {
-    "player", "angle", "radial", "wall", "rain", "crossfire", "encircle", "cross", "spear", "formation"
+    "player", "angle", "radial", "wall", "rain", "crossfire", "encircle", "cross", "spear", "formation",
+    "alternate"
 };
 static const char *const SIDE_NAMES[] = { "top", "bottom", "left", "right" };
 
@@ -289,6 +290,13 @@ int PatternsLoad(const char *path, PatternSet *set, char *err, int errSize)
         } else if (strcmp(key, "sprite_size") == 0) {
             ok = parse_float(value, &fv);
             cur.sprite_size = fv;
+        } else if (strcmp(key, "gravity") == 0) {
+            ok = parse_float(value, &fv);
+            cur.gravity = fv;
+        } else if (strcmp(key, "script") == 0) {
+            /* lua file in resources/scripts without ".lua"; "none" clears it */
+            snprintf(cur.script, SCRIPT_NAME_MAX, "%s",
+                     (strcmp(value, "none") == 0) ? "" : value);
         } else if (strcmp(key, "sprite_rot") == 0) {
             if (strcmp(value, "none") == 0) {
                 cur.sprite_rot = SPRITE_ROT_NONE;
@@ -358,7 +366,8 @@ bool PatternsSave(const char *path, const Pattern *list, int count)
         if (p.jitter != 0.0f) fprintf(f, "  jitter %g\n", p.jitter * RAD2DEG_F);
         if (p.has_angle) fprintf(f, "  angle %g\n", p.angle * RAD2DEG_F);
 
-        if (p.gap != 0 && (p.aim == AIM_WALL || p.aim == AIM_ENCIRCLE || p.aim == AIM_CROSS)) {
+        if (p.gap != 0 && (p.aim == AIM_WALL || p.aim == AIM_ALTERNATE ||
+                           p.aim == AIM_ENCIRCLE || p.aim == AIM_CROSS)) {
             if (p.gap == GAP_RANDOM) fprintf(f, "  gap random\n");
             else fprintf(f, "  gap %d\n", p.gap - 1);
         }
@@ -377,6 +386,8 @@ bool PatternsSave(const char *path, const Pattern *list, int count)
             fprintf(f, "  sprite_size %g\n", p.sprite_size);
             if (p.sprite_rot != SPRITE_ROT_NONE) fprintf(f, "  sprite_rot travel\n");
         }
+        if (p.gravity != 0.0f) fprintf(f, "  gravity %g\n", p.gravity);
+        if (p.script[0]) fprintf(f, "  script %s\n", p.script);
 
         fprintf(f, "  color %d,%d,%d\n", p.color.r, p.color.g, p.color.b);
         fprintf(f, "end\n\n");
