@@ -44,7 +44,10 @@ typedef struct {
  * A script owns the whole shot. It defines spawn(ctx), where ctx carries
  * width, height, player_x, player_y, shot, count, spread, speed, radius and
  * gravity, and returns a table of {x=,y=,angle=,speed=} bullets with angles in
- * degrees. Radius, damage, colour and sprite still come from the pattern. */
+ * degrees. Radius, damage, colour and sprite still come from the pattern.
+ *
+ * Patterns without a `script` run their aim from resources/scripts/aims.lua,
+ * so all spawn logic - built-in aims included - is lua. */
 
 /* Load a file. Returns the number of patterns, or -1 on error (message in
    err). Existing contents of out are replaced. */

@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "bullet.h"
+#include "player_stats.h"
 #include "patterns.h"
 #include "patterns_io.h"
 #include <math.h>
@@ -74,9 +75,8 @@ static const char *MENU_ITEMS[] = { "Start", "Difficulty", "Quit" };
 
 static int width = 1200, height = 600;
 
-static const float BALL_SIZE = 10;
-static const int MAX_HP = 100;
-static const float INVULN_TIME = 1.0f;
+/* from resources/player.txt, falling back to the defaults */
+static PlayerStats stats;
 
 static float speed = 500;
 static float pos_x, pos_y;
@@ -101,12 +101,35 @@ static bool quit_requested = false;
 
 static Texture2D player_tex;
 static bool have_tex = false;
-static float tex_scale = 1.0f;
 
 /* ---------------- helpers ---------------- */
 static void draw_centered(const char *text, int y, int size, Color color)
 {
     DrawText(text, (width - MeasureText(text, size)) / 2, y, size, color);
+}
+
+/* resources/player.txt, wherever the game was launched from */
+static void load_player_stats(void)
+{
+    stats = PlayerStatsDefaults();
+    const char *app = GetApplicationDirectory();
+    const char *candidates[] = {
+        TextFormat("%s../resources/player.txt", app),
+        TextFormat("%sresources/player.txt", app),
+        "resources/player.txt",
+    };
+    char err[256] = { 0 };
+    for (int i = 0; i < 3; i++) {
+        if (!FileExists(candidates[i])) continue;
+        PlayerStats loaded;
+        if (PlayerStatsLoad(candidates[i], &loaded, err, sizeof err)) {
+            stats = loaded;
+            TraceLog(LOG_INFO, "PLAYER: loaded stats from %s", candidates[i]);
+        } else {
+            TraceLog(LOG_WARNING, "PLAYER: %s: %s (using defaults)", candidates[i], err);
+        }
+        return;
+    }
 }
 
 static void load_player_texture(void)
@@ -128,7 +151,6 @@ static void load_player_texture(void)
             if (player_tex.id != 0) {
                 have_tex = true;
                 SetTextureFilter(player_tex, TEXTURE_FILTER_POINT);  /* crisp pixels */
-                tex_scale = (BALL_SIZE * 2) / (float)player_tex.width;
                 return;
             }
         }
@@ -140,22 +162,25 @@ static void load_player_texture(void)
 static void draw_player(float x, float y, Color tint)
 {
     if (have_tex) {
-        float size = player_tex.width * tex_scale;
+        /* scaled from the live size, so editing stats shows up without a restart */
+        float scale = (stats.size * 2.0f) / (float)player_tex.width;
+        float size = player_tex.width * scale;
         DrawTextureEx(player_tex, (Vector2){ x - size / 2, y - size / 2 },
-                      0.0f, tex_scale, tint);
+                      0.0f, scale, tint);
     } else {
-        DrawCircleV((Vector2){ x, y }, BALL_SIZE, tint);
+        DrawCircleV((Vector2){ x, y }, stats.size, tint);
     }
 }
 
 static void reset_run(void)
 {
     const Difficulty *d = &DIFFS[diff_index];
-    speed = d->player;
+    /* difficulty scales the speed the player stats asked for */
+    speed = stats.speed * (d->player / PlayerStatsDefaults().speed);
     for (int i = 0; i < pattern_count; i++)
         active[i] = scale_pattern(&patterns[i], d->scale);
 
-    hp = MAX_HP;
+    hp = stats.max_hp;
     invuln = 0.0f;
     bullets.count = 0;
     pattern_index = 0;
@@ -170,12 +195,13 @@ static void reset_run(void)
 static void draw_health_bar(void)
 {
     const int bar_w = 220, bar_h = 18, x = 10, y = 38;
-    float frac = (float)hp / MAX_HP;
+    int max_hp = stats.max_hp > 0 ? stats.max_hp : 1;
+    float frac = (float)hp / max_hp;
     DrawRectangle(x, y, bar_w, bar_h, (Color){ 40, 40, 40, 255 });
     DrawRectangle(x, y, (int)(bar_w * frac), bar_h,
                   frac > 0.3f ? (Color){ 60, 200, 90, 255 } : (Color){ 220, 70, 70, 255 });
     DrawRectangleLines(x, y, bar_w, bar_h, WHITE);
-    DrawText(TextFormat("HP %d/%d", hp > 0 ? hp : 0, MAX_HP), x + bar_w + 8, y + 2, 16, WHITE);
+    DrawText(TextFormat("HP %d/%d", hp > 0 ? hp : 0, max_hp), x + bar_w + 8, y + 2, 16, WHITE);
 }
 
 /* circle-circle collision against every bullet; returns damage taken */
@@ -187,13 +213,13 @@ static int player_hit(void)
         Bullet *b = &bullets.items[i];
         if (b->dead) continue;
         float dx = b->x - pos_x, dy = b->y - pos_y;
-        float rr = b->radius + BALL_SIZE;
+        float rr = b->radius + stats.size;
         if (dx * dx + dy * dy <= rr * rr) {
             taken += b->damage;
             b->dead = true;
         }
     }
-    if (taken) invuln = INVULN_TIME;
+    if (taken) invuln = stats.invuln;
     return taken;
 }
 
@@ -286,8 +312,8 @@ static void update_play(float dt)
         pos_x += dx * speed * dt;
         pos_y += dy * speed * dt;
         /* clamp against the live window size (it can be resized any time) */
-        pos_x = fminf(fmaxf(pos_x, BALL_SIZE), width  - BALL_SIZE);
-        pos_y = fminf(fmaxf(pos_y, BALL_SIZE), height - BALL_SIZE);
+        pos_x = fminf(fmaxf(pos_x, stats.size), width  - stats.size);
+        pos_y = fminf(fmaxf(pos_y, stats.size), height - stats.size);
 
         invuln = fmaxf(0.0f, invuln - dt);
 
@@ -361,6 +387,7 @@ int main(void)
     if (pattern_count <= 0) pattern_count = 1;
 
     load_player_texture();
+    load_player_stats();
     reset_run();
 
     while (!WindowShouldClose() && !quit_requested) {
@@ -374,6 +401,7 @@ int main(void)
         if (IsKeyPressed(KEY_F5)) {
             patterns = PatternsGet(&pattern_count);
             if (pattern_count <= 0) pattern_count = 1;
+            load_player_stats();
             reset_run();          /* clears bullets, so sprite ids are safe to drop */
             reload_bullet_sprites();
             state = STATE_MENU;

@@ -13,3 +13,6 @@
 # Resource files
 *.rc
 game.rc.data
+
+# scratch harnesses / temp exports
+tools/_*

@@ -29,6 +29,7 @@
 #include "bullet.h"
 #include "patterns.h"
 #include "patterns_io.h"
+#include "player_stats.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -72,6 +73,10 @@ static int         count = 0;
 static int         sel = 0;
 static int         list_offset = 0;
 static char        path[4096] = { 0 };
+static PlayerStats pstats;
+static char        player_path[4096] = { 0 };
+
+static void load_player_stats(void);   /* defined with the player block below */
 
 static RenderTexture2D canvas;
 
@@ -267,19 +272,27 @@ static void load_initial(const char *arg)
     resolve_path(arg);
     scan_sprites();
     scan_scripts();
+    load_player_stats();
     sel = 0;
     reset_preview();
 }
 
 static void do_save(void)
 {
-    if (PatternsSave(path, set.items, count)) {
+    bool patterns_ok = PatternsSave(path, set.items, count);
+    bool player_ok = PlayerStatsSave(player_path, &pstats);
+    if (patterns_ok && player_ok) {
         char msg[4200];
-        snprintf(msg, sizeof msg, "saved %d patterns to %s", count, path);
+        snprintf(msg, sizeof msg, "saved %d patterns and player stats to %s",
+                 count, GetDirectoryPath(path));
+        say(msg);
+    } else if (!patterns_ok) {
+        char msg[4200];
+        snprintf(msg, sizeof msg, "could not write %s", path);
         say(msg);
     } else {
         char msg[4200];
-        snprintf(msg, sizeof msg, "could not write %s", path);
+        snprintf(msg, sizeof msg, "could not write %s", player_path);
         say(msg);
     }
 }
@@ -297,6 +310,7 @@ static void do_reload(void)
         reset_preview();
         scan_sprites();              /* picks up pngs dropped in since start-up */
         scan_scripts();
+        load_player_stats();
         reload_bullet_sprites();     /* reset_preview() cleared the bullets above */
         say("reloaded from disk");
     } else {
@@ -305,9 +319,13 @@ static void do_reload(void)
 }
 
 /* --------------------------------------------------------------- widgets */
+/* Widgets draw relative to this anchor so the same sliders serve the
+   properties panel and the player block under the canvas. */
+static float row_x = PANEL_X, row_y = PANEL_Y, row_w = PANEL_W;
+
 static Rectangle prop_row(int index)
 {
-    return (Rectangle){ (float)PANEL_X, (float)(PANEL_Y + index * PROP_ROW_H), (float)PANEL_W, (float)PROP_ROW_H };
+    return (Rectangle){ row_x, row_y + index * PROP_ROW_H, row_w, PROP_ROW_H };
 }
 
 static bool mouse_on(Rectangle r)
@@ -669,7 +687,37 @@ static void draw_info(void)
     }
 
     DrawText("Space: pause    R: restart    Up/Down: previous / next",
-             CANVAS_X, WIN_H - 30, 15, C_DIM);
+             CANVAS_X, GetScreenHeight() - 30, 15, C_DIM);
+}
+
+/* ------------------------------------------------------------ player block */
+/* The player's own numbers, saved next to patterns.txt. */
+static void load_player_stats(void)
+{
+    snprintf(player_path, sizeof player_path, "%s/player.txt", GetDirectoryPath(path));
+    char err[256] = { 0 };
+    PlayerStats loaded;
+    if (!PlayerStatsLoad(player_path, &loaded, err, sizeof err)) {
+        say(err);
+        pstats = PlayerStatsDefaults();
+        return;
+    }
+    pstats = loaded;
+}
+
+static void draw_player_panel(void)
+{
+    DrawText("PLAYER", CANVAS_X + 20, 612, 20, C_DIM);
+    /* indented past the list buttons, which end at LIST_X + 286 */
+    row_x = CANVAS_X + 20;
+    row_y = 640;
+    row_w = 450;
+
+    int row = 0;
+    if (slider_i("max hp", row++, &pstats.max_hp, 1, 999)) {}
+    if (slider_f("speed", row++, &pstats.speed, 50.0f, 1200.0f, 10.0f)) {}
+    if (slider_f("size", row++, &pstats.size, 2.0f, 40.0f, 0.5f)) {}
+    if (slider_f("invuln s", row++, &pstats.invuln, 0.0f, 5.0f, 0.05f)) {}
 }
 
 /* Which rows the panel shows. Kept as predicates rather than inline tests so
@@ -718,6 +766,9 @@ static void draw_panel(void)
 
     Pattern *p = &set.items[sel];
     int row = 0;
+    row_x = PANEL_X;
+    row_y = PANEL_Y;
+    row_w = PANEL_W;
 
     int origin = (int)p->origin;
     if (cycler("origin", row++, &origin, ORIGIN_LABELS, 7)) p->origin = (Origin)origin;
@@ -1000,12 +1051,13 @@ int main(int argc, char **argv)
         if (argv[1][0] != '-') arg_path = argv[1];
     }
 
-    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(WIN_W, WIN_H, "Bullet Hell - Pattern Editor");
     if (!IsWindowReady()) {
         fprintf(stderr, "error: could not create a window\n");
         return 1;
     }
+    SetWindowMinSize(WIN_W, WIN_H);   /* the layout below is a fixed grid */
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
 
@@ -1037,6 +1089,7 @@ int main(int argc, char **argv)
         draw_canvas();
         draw_list();
         draw_info();
+        draw_player_panel();
         draw_panel();
 
         EndDrawing();

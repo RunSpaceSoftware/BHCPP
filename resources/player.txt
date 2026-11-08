@@ -1,0 +1,7 @@
+# Bullet Hell player stats
+# Written by tools/pattern_editor - you can also edit this by hand.
+
+hp 100
+speed 500
+size 10
+invuln 1

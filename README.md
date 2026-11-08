@@ -36,7 +36,13 @@ Builds the game and both tools, then runs the shape tests, the
 
 - `resources/patterns.txt` - one block per pattern; `patterns_io.h` documents
   every key.
+- `resources/player.txt` - hp, speed, size and invulnerability time. The
+  pattern editor edits these too.
 - `resources/*.png` - bullet sprites, picked per pattern with `sprite`.
-- `resources/scripts/*.lua` - scripted spawn logic, picked with `script`.
+- `resources/scripts/aims.lua` - the spawn logic for every built-in aim
+  (`player`, `angle`, `radial`, `wall`, `rain`, `crossfire`, `encircle`,
+  `cross`, `spear`, `formation`, `alternate`).
+- `resources/scripts/*.lua` - per-pattern logic, picked with `script`; a
+  pattern with a script ignores its `aim`.
 
 Lua 5.4.7 is vendored in `third_party/lua` (MIT) so there is nothing to install.

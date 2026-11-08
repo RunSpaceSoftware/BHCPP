@@ -414,7 +414,7 @@ endif
 # the game reads at start-up). It is not part of the game binary.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP editor
 #   run:   tools/pattern_editor.exe
-EDITOR_SRC = tools/pattern_editor.c bullet.c patterns.c patterns_io.c pattern_script.c platform_compat.c $(LUA_SRC)
+EDITOR_SRC = tools/pattern_editor.c bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 editor: $(EDITOR_SRC) $(WIN_RES)
 	$(CC) -o tools/pattern_editor$(EXT) $(EDITOR_SRC) $(WIN_RES) $(WIN_LDFLAGS) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
@@ -430,7 +430,7 @@ endif
 # and formation spawn code. No window is created, so it runs anywhere.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest
 #   run:   tools/shape_test.exe
-SHAPETEST_SRC = tools/shape_test.c bullet.c patterns.c patterns_io.c pattern_script.c platform_compat.c $(LUA_SRC)
+SHAPETEST_SRC = tools/shape_test.c bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 shapetest: $(SHAPETEST_SRC) $(WIN_RES)
 	$(CC) -o tools/shape_test$(EXT) $(SHAPETEST_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)

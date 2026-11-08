@@ -6,13 +6,17 @@
 /* One bullet a script asked for. Angles are degrees, to match patterns.txt. */
 typedef struct { float x, y, angle, speed; } ShotSpec;
 
-#define MAX_SCRIPT_SHOTS 256
+#define MAX_SCRIPT_SHOTS 512
 
-/* Run resources/scripts/<p->script>.lua and fill out[] with the bullets its
-   spawn(ctx) returns. Returns the count, or -1 with a message in err.
-   The lua file defines:  function spawn(ctx) return { {x=,y=,angle=,speed=} } end */
+/* Run the pattern's spawn logic and fill out[] with the bullets it returns.
+   A pattern with `script` set runs resources/scripts/<script>.lua; otherwise
+   its aim runs from resources/scripts/aims.lua. Returns the count, or -1 with
+   a message in err. spin_now is the accumulated spin angle in radians. */
 int ScriptSpawn(const Pattern *p, int width, int height, float player_x, float player_y,
-                int shot, ShotSpec *out, int maxOut, char *err, int errSize);
+                int shot, float spin_now, ShotSpec *out, int maxOut, char *err, int errSize);
+
+/* Drop cached scripts so edited .lua files are re-read. */
+void ScriptReload(void);
 
 void ScriptShutdown(void);
 

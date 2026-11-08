@@ -13,6 +13,7 @@
  */
 #include "bullet.h"
 #include "patterns.h"
+#include "player_stats.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -375,6 +376,49 @@ static void test_script(void)
     check(none.count == 0, "a missing script spawns nothing");
 }
 
+/* player stats: defaults, a round trip, and a bad value reported */
+static void test_player_stats(void)
+{
+    printf("player stats:\n");
+    PlayerStats d = PlayerStatsDefaults();
+    check(d.max_hp > 0 && d.speed > 0 && d.size > 0 && d.invuln >= 0, "defaults are sane");
+
+    PlayerStats want;
+    want.max_hp = 42;
+    want.speed = 640.0f;
+    want.size = 14.0f;
+    want.invuln = 2.5f;
+    const char *tmp = "tools/_player_test.txt";
+    check(PlayerStatsSave(tmp, &want), "stats save");
+
+    PlayerStats got;
+    char err[256] = { 0 };
+    check(PlayerStatsLoad(tmp, &got, err, sizeof err), "stats load");
+    check(got.max_hp == 42 && near(got.speed, 640.0f, 0.01f) &&
+          near(got.size, 14.0f, 0.01f) && near(got.invuln, 2.5f, 0.01f),
+          "values survive the round trip");
+    remove(tmp);
+
+    PlayerStats missing;
+    char missing_err[256] = { 0 };
+    check(PlayerStatsLoad("tools/_no_such_player.txt", &missing, missing_err, sizeof missing_err),
+          "a missing file is not an error");
+    check(missing.max_hp == d.max_hp, "a missing file falls back to defaults");
+
+    /* an out-of-range value must be reported, not silently used */
+    FILE *f = fopen("tools/_bad_player.txt", "wb");
+    if (f) {
+        fprintf(f, "hp 0\n");
+        fclose(f);
+        PlayerStats bad;
+        char bad_err[256] = { 0 };
+        check(!PlayerStatsLoad("tools/_bad_player.txt", &bad, bad_err, sizeof bad_err),
+              "hp 0 is rejected");
+        check(strstr(bad_err, "hp") != NULL, "the error names the offending key");
+        remove("tools/_bad_player.txt");
+    }
+}
+
 int main(void)
 {
     printf("shape tests\n===========\n");
@@ -387,6 +431,7 @@ int main(void)
     test_gravity();
     test_alternate();
     test_script();
+    test_player_stats();
 
     printf("\n%s (%d failure%s)\n",
            failures ? "FAILED" : "all good", failures, failures == 1 ? "" : "s");
