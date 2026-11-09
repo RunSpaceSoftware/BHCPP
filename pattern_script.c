@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /* Scripts are compiled once and kept as registry refs, so a shot costs one
    pcall instead of a parse. The built-in aims live in one table. */
@@ -23,15 +24,43 @@ static ScriptEntry g_scripts[MAX_SCRIPTS];
 static int g_count = 0;
 static int g_aims_ref = LUA_NOREF;
 static char g_dir[4096] = { 0 };
+static char g_last_err[256] = { 0 };   /* last message ScriptSpawn handed out */
+
+/* Pattern scripts only compute bullets, so they get the pure libraries and
+   nothing that touches the machine: no io, no os, no package/require, and the
+   base library's dofile/loadfile are removed. That keeps a pattern pack
+   somebody sends you from being able to read files or run programs. */
+static void open_script_libs(lua_State *L)
+{
+    static const luaL_Reg libs[] = {
+        { "_G", luaopen_base },
+        { LUA_COLIBNAME, luaopen_coroutine },
+        { LUA_TABLIBNAME, luaopen_table },
+        { LUA_STRLIBNAME, luaopen_string },
+        { LUA_MATHLIBNAME, luaopen_math },
+        { LUA_UTF8LIBNAME, luaopen_utf8 },
+        { NULL, NULL }
+    };
+    for (const luaL_Reg *l = libs; l->func; l++) {
+        luaL_requiref(L, l->name, l->func, 1);
+        lua_pop(L, 1);
+    }
+    lua_pushnil(L);
+    lua_setglobal(L, "dofile");
+    lua_pushnil(L);
+    lua_setglobal(L, "loadfile");
+}
 
 static lua_State *state(void)
 {
     if (!g_L) {
         g_L = luaL_newstate();
         if (g_L) {
-            luaL_openlibs(g_L);
+            open_script_libs(g_L);
             /* aims use math.random, so give every run a different sequence */
-            if (luaL_dostring(g_L, "math.randomseed(os.time())") != LUA_OK) lua_pop(g_L, 1);
+            char seed[64];
+            snprintf(seed, sizeof seed, "math.randomseed(%lld)", (long long)time(NULL));
+            if (luaL_dostring(g_L, seed) != LUA_OK) lua_pop(g_L, 1);
         }
     }
     return g_L;
@@ -115,6 +144,11 @@ static int script_ref(const char *name, char *err, int errSize)
         snprintf(err, errSize, "more than %d scripts loaded", MAX_SCRIPTS);
         return -1;
     }
+    /* every script defines the global spawn(); clear it first so a script that
+       forgets to define one is reported instead of running the previous
+       script's spawn() */
+    lua_pushnil(L);
+    lua_setglobal(L, "spawn");
     if (!load_chunk(name, err, errSize)) return -1;
 
     lua_getglobal(L, "spawn");
@@ -243,8 +277,8 @@ static int read_shots(lua_State *L, const Pattern *p, ShotSpec *out, int maxOut)
     return n;
 }
 
-int ScriptSpawn(const Pattern *p, int width, int height, float player_x, float player_y,
-                int shot, float spin_now, ShotSpec *out, int maxOut, char *err, int errSize)
+static int spawn_impl(const Pattern *p, int width, int height, float player_x, float player_y,
+                      int shot, float spin_now, ShotSpec *out, int maxOut, char *err, int errSize)
 {
     if (!p) return 0;
     lua_State *L = state();
@@ -284,8 +318,23 @@ int ScriptSpawn(const Pattern *p, int width, int height, float player_x, float p
     return n;
 }
 
+int ScriptSpawn(const Pattern *p, int width, int height, float player_x, float player_y,
+                int shot, float spin_now, ShotSpec *out, int maxOut, char *err, int errSize)
+{
+    int n = spawn_impl(p, width, height, player_x, player_y, shot, spin_now,
+                       out, maxOut, err, errSize);
+    if (n < 0) {
+        /* A broken script would otherwise repeat its message on every shot.
+           Hand each distinct message out once; ScriptReload() starts over. */
+        if (strcmp(err, g_last_err) == 0) err[0] = '\0';
+        else snprintf(g_last_err, sizeof g_last_err, "%s", err);
+    }
+    return n;
+}
+
 void ScriptReload(void)
 {
+    g_last_err[0] = '\0';
     if (!g_L) return;
     lua_close(g_L);
     g_L = NULL;

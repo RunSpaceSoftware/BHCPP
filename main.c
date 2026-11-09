@@ -3,6 +3,7 @@
 #include "player_stats.h"
 #include "patterns.h"
 #include "patterns_io.h"
+#include "pattern_script.h"
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -88,6 +89,7 @@ static Pattern active[MAX_PATTERNS];
 static int pattern_index, shots_left;
 static float shot_timer;
 static SpinState spin_state;
+static bool warn_pending;      /* the next shot is preceded by a warning */
 
 /* pattern list actually used: resources/patterns.txt if present, else the
    built-in table from patterns.c (see patterns_io.c) */
@@ -101,6 +103,11 @@ static bool quit_requested = false;
 
 static Texture2D player_tex;
 static bool have_tex = false;
+
+/* one-line message shown on the menu, e.g. the result of an F5 reload */
+static char status_text[160] = { 0 };
+static bool status_ok = true;
+static float status_timer = 0.0f;
 
 /* ---------------- helpers ---------------- */
 static void draw_centered(const char *text, int y, int size, Color color)
@@ -172,6 +179,20 @@ static void draw_player(float x, float y, Color tint)
     }
 }
 
+/* Start pattern `index`: reset its counters and, if it has a warning, hold the
+   first shot back so the player can get clear of a fixed spawn point. */
+static void begin_pattern(int index)
+{
+    pattern_index = index;
+    shots_left = active[index].repeat;
+    spin_state.angle = 0.0f;
+    spin_state.shot = 0;
+
+    float warn = pattern_warn_seconds(&active[index]);
+    warn_pending = warn > 0.0f;
+    if (warn_pending && shot_timer < warn) shot_timer = warn;
+}
+
 static void reset_run(void)
 {
     const Difficulty *d = &DIFFS[diff_index];
@@ -183,11 +204,8 @@ static void reset_run(void)
     hp = stats.max_hp;
     invuln = 0.0f;
     bullets.count = 0;
-    pattern_index = 0;
-    shots_left = active[0].repeat;
     shot_timer = 0.0f;
-    spin_state.angle = 0.0f;
-    spin_state.shot = 0;
+    begin_pattern(0);
     pos_x = width / 2;
     pos_y = height / 2;
 }
@@ -286,6 +304,9 @@ static void draw_menu(void)
     }
     draw_centered("Up/Down + Enter, Left/Right changes difficulty  |  ESC: menu in game  |  F5: reload patterns",
                   height - 40, 16, GRAY);
+    if (status_timer > 0.0f)
+        draw_centered(status_text, height - 70, 18,
+                      status_ok ? (Color){ 90, 220, 120, 255 } : (Color){ 230, 70, 70, 255 });
 }
 
 /* ---------------- gameplay ---------------- */
@@ -321,15 +342,13 @@ static void update_play(float dt)
         shot_timer -= dt;
         if (shot_timer <= 0) {
             const Pattern *pat = &active[pattern_index];
+            warn_pending = false;
             spawn_from_pattern(&bullets, pat, width, height, pos_x, pos_y, &spin_state);
             shot_timer = pat->delay;
             if (pat->repeat > 0) {
                 shots_left--;
                 if (shots_left <= 0) {
-                    pattern_index = (pattern_index + 1) % pattern_count;
-                    shots_left = active[pattern_index].repeat;
-                    spin_state.angle = 0.0f;
-                    spin_state.shot = 0;
+                    begin_pattern((pattern_index + 1) % pattern_count);
                 }
             }
         }
@@ -343,6 +362,29 @@ static void update_play(float dt)
     }
 }
 
+/* Pulsing circle over the spot a fixed-point pattern is about to fire from.
+   Rings and spirals are lethal on top of their origin, so the player gets the
+   pattern's warning time to move away first. */
+static void draw_warning(void)
+{
+    const Pattern *pat = &active[pattern_index];
+    float warn = pattern_warn_seconds(pat);
+    if (!warn_pending || shot_timer >= warn) return;   /* only the last `warn` seconds */
+
+    float pulse = 0.5f + 0.5f * sinf((float)GetTime() * 16.0f);
+    Color col = pat->color;
+    if (pat->origin == ORIGIN_POINT) {
+        float sx = (float)width / BASE_W, sy = (float)height / BASE_H;
+        Vector2 c = { pat->point.x * sx, pat->point.y * sy };
+        float r = pat->warn_radius * (sx < sy ? sx : sy);
+        DrawCircleV(c, r, Fade(col, 0.10f + 0.15f * pulse));
+        DrawRing(c, r - 4, r, 0, 360, 64, Fade(col, 0.5f + 0.5f * pulse));
+        draw_centered("DANGER ZONE - MOVE AWAY", 14, 24, Fade(col, 0.6f + 0.4f * pulse));
+    } else {
+        draw_centered("INCOMING", 14, 24, Fade(col, 0.6f + 0.4f * pulse));
+    }
+}
+
 static void draw_play(void)
 {
     /* player sprite, flashing while invulnerable */
@@ -353,6 +395,7 @@ static void draw_play(void)
             draw_player(pos_x, pos_y, (Color){ 255, 255, 255, 100 });
     }
 
+    if (hp > 0) draw_warning();
     draw_bullets(&bullets);
 
     if (hp > 0) {
@@ -377,7 +420,9 @@ int main(void)
 #endif
         return 1;
     }
-    SetWindowMinSize(640, 360);
+    /* Smaller than this the hole in a wall of bullets gets too narrow to fit
+       through (about 21px at 640x360 for a 20px player). */
+    SetWindowMinSize(800, 480);
     SetExitKey(KEY_NULL);                    /* ESC goes back to the menu */
     SetTargetFPS(60);
 
@@ -397,10 +442,29 @@ int main(void)
         width = GetScreenWidth();
         height = GetScreenHeight();
 
-        /* reload resources/patterns.txt without restarting the game */
+        if (status_timer > 0.0f) status_timer -= dt;
+
+        /* reload patterns.txt, lua scripts, sprites and player stats without
+           restarting. A bad patterns.txt keeps the previous patterns. */
         if (IsKeyPressed(KEY_F5)) {
+            bool loaded = PatternsReload();
+            ScriptReload();
             patterns = PatternsGet(&pattern_count);
             if (pattern_count <= 0) pattern_count = 1;
+            if (loaded) {
+                snprintf(status_text, sizeof status_text,
+                         "Reloaded %d patterns, scripts, sprites and stats", pattern_count);
+                status_ok = true;
+            } else if (PatternsPath()[0]) {
+                snprintf(status_text, sizeof status_text,
+                         "patterns.txt has an error - kept the previous patterns (see console)");
+                status_ok = false;
+            } else {
+                snprintf(status_text, sizeof status_text,
+                         "No patterns.txt found - using the built-in patterns");
+                status_ok = false;
+            }
+            status_timer = 6.0f;
             load_player_stats();
             reset_run();          /* clears bullets, so sprite ids are safe to drop */
             reload_bullet_sprites();

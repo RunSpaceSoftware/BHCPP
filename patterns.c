@@ -191,6 +191,14 @@ Pattern pattern_apply_defaults(Pattern p)
     if (p.segments <= 0)     p.segments = 3;
     if (p.length <= 0)       p.length = 90.0f;
     if (p.sprite_size <= 0)  p.sprite_size = p.radius * 2.0f;
+    if (p.warn_radius <= 0)  p.warn_radius = DEFAULT_WARN_RADIUS;
     p.sprite[SPRITE_NAME_MAX - 1] = '\0';
     return p;
+}
+
+float pattern_warn_seconds(const Pattern *p)
+{
+    if (p->warn > 0.0f) return p->warn;
+    if (p->warn < 0.0f) return 0.0f;
+    return (p->origin == ORIGIN_POINT) ? DEFAULT_WARN : 0.0f;
 }

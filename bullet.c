@@ -88,7 +88,9 @@ static void spawn_one(BulletList *list, const Pattern *p, int width, int height,
     int n = ScriptSpawn(p, width, height, player_x, player_y, spin->shot,
                         spin->angle, specs, MAX_SCRIPT_SHOTS, err, sizeof err);
     if (n < 0) {
-        TraceLog(LOG_WARNING, "PATTERN: %s", err);
+        /* ScriptSpawn leaves err empty when it already reported this exact
+           problem, so a broken script warns once instead of on every shot */
+        if (err[0]) TraceLog(LOG_WARNING, "PATTERN: %s", err);
         return;
     }
     for (int i = 0; i < n; i++)
@@ -108,7 +110,8 @@ Pattern scale_pattern(const Pattern *pat, DiffScale d)
     /* "More bullets" = a bigger count where that keeps the shape sensible
        (rings, fans, rain, spiral arms, formations). Patterns where extra
        bullets would just stack up or close the escape gap (single shots,
-       walls, cross, crossfire, spears) fire more *often* instead. */
+       walls - including alternating walls - cross, crossfire, spears) fire
+       more *often* instead. */
     Pattern p = pattern_apply_defaults(*pat);
     p.speed = pat->speed * d.speed;
     p.damage = (int)roundf(p.damage * d.damage);
@@ -117,8 +120,9 @@ Pattern scale_pattern(const Pattern *pat, DiffScale d)
         /* A spear is a solid shaft along one line: extra bullets only pack it
            tighter, they do not widen the thing the player has to dodge, so
            they would be difficulty-neutral. Fire the spear again sooner. */
-        if (p.count >= 3 && p.aim != AIM_WALL && p.aim != AIM_CROSS
-                         && p.aim != AIM_CROSSFIRE && p.aim != AIM_SPEAR) {
+        if (p.count >= 3 && p.aim != AIM_WALL && p.aim != AIM_ALTERNATE
+                         && p.aim != AIM_CROSS && p.aim != AIM_CROSSFIRE
+                         && p.aim != AIM_SPEAR) {
             int c = (int)roundf(p.count * d.count);
             p.count = c < 3 ? 3 : c;
         } else {

@@ -33,6 +33,8 @@ typedef struct {
  *     sprite_rot travel  # upright, or travel to face the flight direction
  *     gravity 520        # px/s^2 downward, so a shot arcs like a shell
  *     script cannon      # lua in resources/scripts, replaces the spawn logic
+ *     warn 1.5           # seconds of warning before the first shot (off = none)
+ *     warn_radius 130    # size of the warning circle (point-origin patterns)
  *   end
  *
  * Angles (spread, spin, jitter, angle) are in degrees, everything else in
@@ -69,6 +71,11 @@ int SideFromName(const char *name);
    otherwise the built-in PATTERNS[] table. Loaded once, then cached. */
 const Pattern *PatternsGet(int *count);
 const char    *PatternsPath(void);          /* "" when using the built-in table */
-bool           PatternsReload(void);        /* re-read from disk */
+bool           PatternsReload(void);        /* re-read from disk; if the file is
+                                               missing or has an error the patterns
+                                               already loaded stay in use */
+/* Load one file into the runtime table. Returns false and leaves the current
+   table untouched when the file cannot be read or parsed. */
+bool           PatternsLoadRuntime(const char *path);
 
 #endif

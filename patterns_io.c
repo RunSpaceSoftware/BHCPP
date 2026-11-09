@@ -293,6 +293,17 @@ int PatternsLoad(const char *path, PatternSet *set, char *err, int errSize)
         } else if (strcmp(key, "gravity") == 0) {
             ok = parse_float(value, &fv);
             cur.gravity = fv;
+        } else if (strcmp(key, "warn") == 0) {
+            /* seconds of warning before the first shot; off / none / 0 = no warning */
+            if (strcmp(value, "off") == 0 || strcmp(value, "none") == 0) {
+                cur.warn = -1.0f;
+            } else {
+                ok = parse_float(value, &fv);
+                cur.warn = (ok && fv <= 0.0f) ? -1.0f : fv;
+            }
+        } else if (strcmp(key, "warn_radius") == 0) {
+            ok = parse_float(value, &fv);
+            cur.warn_radius = fv;
         } else if (strcmp(key, "script") == 0) {
             /* lua file in resources/scripts without ".lua"; "none" clears it */
             snprintf(cur.script, SCRIPT_NAME_MAX, "%s",
@@ -388,6 +399,10 @@ bool PatternsSave(const char *path, const Pattern *list, int count)
         }
         if (p.gravity != 0.0f) fprintf(f, "  gravity %g\n", p.gravity);
         if (p.script[0]) fprintf(f, "  script %s\n", p.script);
+        if (p.warn > 0.0f) fprintf(f, "  warn %g\n", p.warn);
+        else if (p.warn < 0.0f) fprintf(f, "  warn off\n");
+        if (p.origin == ORIGIN_POINT && p.warn_radius != DEFAULT_WARN_RADIUS)
+            fprintf(f, "  warn_radius %g\n", p.warn_radius);
 
         fprintf(f, "  color %d,%d,%d\n", p.color.r, p.color.g, p.color.b);
         fprintf(f, "end\n\n");
@@ -399,9 +414,30 @@ bool PatternsSave(const char *path, const Pattern *list, int count)
 
 /* ---------------------------------------------------------- runtime table */
 static PatternSet g_set;
+static PatternSet g_stage;   /* a file is parsed here first, so a typo in an
+                                edited patterns.txt cannot damage the live table */
 static int        g_count = 0;
 static bool       g_tried = false;
 static char       g_path[4096] = { 0 };
+
+bool PatternsLoadRuntime(const char *path)
+{
+    char err[256] = { 0 };
+    int n = PatternsLoad(path, &g_stage, err, sizeof err);
+    if (n <= 0) {
+        TraceLog(LOG_WARNING, "PATTERNS: %s", n < 0 ? err : "no patterns in file");
+        return false;
+    }
+
+    g_set = g_stage;
+    /* the names live inside the set, so point them at the copy */
+    for (int i = 0; i < n; i++) g_set.items[i].name = g_set.names[i];
+    g_count = n;
+    g_tried = true;
+    snprintf(g_path, sizeof g_path, "%.4090s", path);
+    TraceLog(LOG_INFO, "PATTERNS: loaded %d patterns from %s", n, g_path);
+    return true;
+}
 
 static bool load_runtime(void)
 {
@@ -412,22 +448,14 @@ static bool load_runtime(void)
     snprintf(paths[1], sizeof paths[1], "%s../resources/patterns.txt", app);
     snprintf(paths[2], sizeof paths[2], "resources/patterns.txt");
 
-    char err[256] = { 0 };
     for (int i = 0; i < 3; i++) {
         if ((i > 0) && (strcmp(paths[i], paths[i - 1]) == 0)) continue;
         if (!FileExists(paths[i])) continue;
-
-        int n = PatternsLoad(paths[i], &g_set, err, sizeof err);
-        if (n > 0) {
-            g_count = n;
-            snprintf(g_path, sizeof g_path, "%.4090s", paths[i]);
-            TraceLog(LOG_INFO, "PATTERNS: loaded %d patterns from %s", n, g_path);
-            return true;
-        }
-        TraceLog(LOG_WARNING, "PATTERNS: %s", err);
+        if (PatternsLoadRuntime(paths[i])) return true;
     }
 
-    TraceLog(LOG_INFO, "PATTERNS: no patterns.txt - using the built-in table");
+    if (g_count > 0) TraceLog(LOG_WARNING, "PATTERNS: keeping the previously loaded patterns");
+    else             TraceLog(LOG_INFO, "PATTERNS: no patterns.txt - using the built-in table");
     return false;
 }
 
@@ -454,8 +482,7 @@ const char *PatternsPath(void)
 
 bool PatternsReload(void)
 {
-    g_count = 0;
-    g_path[0] = '\0';
+    /* on failure the table that is already loaded stays in use */
     g_tried = true;
     return load_runtime();
 }

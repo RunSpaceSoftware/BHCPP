@@ -40,6 +40,10 @@ typedef enum { SIDE_TOP = 0, SIDE_BOTTOM, SIDE_LEFT, SIDE_RIGHT } Side;
 #define DEFAULT_DAMAGE 10
 #define DEFAULT_RADIUS 6.0f
 
+/* Warning shown before a pattern starts firing (see pattern_warn_seconds). */
+#define DEFAULT_WARN        1.0f
+#define DEFAULT_WARN_RADIUS 130.0f
+
 #define SPRITE_NAME_MAX 64
 #define SCRIPT_NAME_MAX 32
 
@@ -77,6 +81,11 @@ typedef struct {
     SpriteRot sprite_rot;   /* how the sprite is turned when drawn */
     float gravity;          /* px/s^2 pulling the bullet down (0 = straight) */
     char script[SCRIPT_NAME_MAX]; /* lua file in resources/scripts, "" = none */
+    float warn;             /* seconds of warning before the first shot:
+                               0 = default, > 0 = that long, < 0 = none.
+                               Read it through pattern_warn_seconds(). */
+    float warn_radius;      /* size of the warning circle, px in the 1200x600
+                               arena (default 130, scales with the window) */
 } Pattern;
 
 #define MAX_PATTERNS 64
@@ -86,5 +95,11 @@ extern const int PATTERN_COUNT;
 
 /* Returns p with defaults filled in. */
 Pattern pattern_apply_defaults(Pattern p);
+
+/* Seconds the game warns the player before this pattern's first shot.
+   Patterns that fire from a fixed point (rings, spirals, lattices) are lethal
+   if you are standing on it when they start, so they warn for DEFAULT_WARN
+   unless `warn` says otherwise; every other pattern defaults to no warning. */
+float pattern_warn_seconds(const Pattern *p);
 
 #endif

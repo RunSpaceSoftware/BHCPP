@@ -75,8 +75,15 @@ Run `game.exe`.
 
 - Menu: `Up`/`Down` to choose, `Left`/`Right` to change difficulty, `Enter` to
   start, `Esc` to quit.
-- In game: arrow keys to move, `R` to restart, `F5` to reload patterns,
-  sprites, scripts and player stats without restarting.
+- In game: arrow keys to move, `R` to restart after game over, `Esc` for the
+  menu, `F5` to reload patterns, sprites, scripts and player stats without
+  restarting. If `patterns.txt` has a typo, F5 says so on the menu and keeps
+  the patterns you already had.
+- Patterns that fire from a fixed point (rings, spirals, lattices) flash a
+  warning circle for a second first, so you can get off the spot. Set `warn`
+  and `warn_radius` per pattern in `patterns.txt` (`warn off` removes it).
+- The window cannot be made smaller than 800x480; below that the holes in the
+  bullet walls get too narrow to fit through.
 
 ## Edit
 
@@ -109,6 +116,9 @@ than by double-clicking it.
 - `resources/*.png` - bullet sprites, picked per pattern with `sprite`.
 - `resources/scripts/aims.lua` - spawn logic for the built-in aims.
 - `resources/scripts/*.lua` - per-pattern scripts, picked with `script`.
+  Scripts only get the base, coroutine, table, string, math and utf8
+  libraries - no `io`, `os` or `require` - so a shared pattern pack cannot
+  touch your files.
 - `tools/make_sprites.py` - regenerates the sample sprites (needs Pillow).
 
 ## TODO

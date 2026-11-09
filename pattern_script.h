@@ -11,11 +11,14 @@ typedef struct { float x, y, angle, speed; } ShotSpec;
 /* Run the pattern's spawn logic and fill out[] with the bullets it returns.
    A pattern with `script` set runs resources/scripts/<script>.lua; otherwise
    its aim runs from resources/scripts/aims.lua. Returns the count, or -1 with
-   a message in err. spin_now is the accumulated spin angle in radians. */
+   a message in err (empty if that exact problem was already reported, so a
+   broken script does not repeat itself on every shot). spin_now is the
+   accumulated spin angle in radians. */
 int ScriptSpawn(const Pattern *p, int width, int height, float player_x, float player_y,
                 int shot, float spin_now, ShotSpec *out, int maxOut, char *err, int errSize);
 
-/* Drop cached scripts so edited .lua files are re-read. */
+/* Drop cached scripts so edited .lua files are re-read, and let errors be
+   reported again. */
 void ScriptReload(void);
 
 void ScriptShutdown(void);

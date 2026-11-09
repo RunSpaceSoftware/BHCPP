@@ -14,6 +14,8 @@
 #include "bullet.h"
 #include "patterns.h"
 #include "player_stats.h"
+#include "patterns_io.h"
+#include "pattern_script.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -376,6 +378,163 @@ static void test_script(void)
     check(none.count == 0, "a missing script spawns nothing");
 }
 
+/* walls must keep the same hole on every difficulty: more bullets would
+   shrink it, so every wall-like aim fires more often instead */
+static void test_wall_scaling(void)
+{
+    printf("difficulty scaling of walls:\n");
+    const DiffScale hard = { 1.25f, 1.5f, 1.0f };
+    const DiffScale easy = { 0.85f, 0.75f, 0.8f };
+    Aim wall_aims[] = { AIM_WALL, AIM_ALTERNATE };
+    const char *names[] = { "wall", "alternate wall" };
+    for (int k = 0; k < 2; k++) {
+        Pattern p = pattern_apply_defaults((Pattern){ 0 });
+        p.aim = wall_aims[k];
+        p.count = 14;
+        p.delay = 0.9f;
+        p.speed = 260;
+        Pattern h = scale_pattern(&p, hard);
+        Pattern e = scale_pattern(&p, easy);
+        char what[96];
+        snprintf(what, sizeof what, "%s keeps its bullet count on Hard", names[k]);
+        check(h.count == 14, what);
+        snprintf(what, sizeof what, "%s keeps its bullet count on Easy", names[k]);
+        check(e.count == 14, what);
+        snprintf(what, sizeof what, "%s fires more often on Hard instead", names[k]);
+        check(h.delay < p.delay, what);
+    }
+}
+
+static bool write_text(const char *path, const char *text)
+{
+    FILE *f = fopen(path, "wb");
+    if (!f) return false;
+    fputs(text, f);
+    fclose(f);
+    return true;
+}
+
+/* scripts: one that forgets spawn(), the error being reported once, and the
+   sandbox. Writes (and removes) throwaway files in resources/scripts. */
+static void test_script_safety(void)
+{
+    printf("script safety:\n");
+    const char *good = "resources/scripts/__t_good.lua";
+    const char *nospawn = "resources/scripts/__t_nospawn.lua";
+    const char *sandbox = "resources/scripts/__t_sandbox.lua";
+    bool wrote = write_text(good, "function spawn(c) return {{x=1,y=1,angle=0,speed=1}} end\n") &&
+                 write_text(nospawn, "-- forgot to define spawn\nlocal x = 1\n") &&
+                 write_text(sandbox,
+                     "function spawn(c)\n"
+                     "  local clean = io == nil and os == nil and package == nil\n"
+                     "      and require == nil and dofile == nil and loadfile == nil\n"
+                     "  if clean and math.floor(2.5) == 2 and string.rep('a', 2) == 'aa' then\n"
+                     "    return {{x=1,y=1,angle=0,speed=1}}\n"
+                     "  end\n"
+                     "  return {}\n"
+                     "end\n");
+    check(wrote, "wrote the throwaway test scripts (run from the repo root)");
+
+    ScriptReload();
+    ShotSpec out[8];
+    char err[256] = { 0 };
+    Pattern p = pattern_apply_defaults((Pattern){ 0 });
+    p.speed = 10;
+
+    snprintf(p.script, SCRIPT_NAME_MAX, "__t_good");
+    check(ScriptSpawn(&p, BASE_W, BASE_H, 0, 0, 0, 0, out, 8, err, sizeof err) == 1,
+          "a script that defines spawn() runs");
+
+    /* this one used to silently run __t_good's spawn() */
+    snprintf(p.script, SCRIPT_NAME_MAX, "__t_nospawn");
+    err[0] = '\0';
+    int n = ScriptSpawn(&p, BASE_W, BASE_H, 0, 0, 0, 0, out, 8, err, sizeof err);
+    check(n < 0, "a script without spawn() is an error, not the previous script's spawn()");
+    check(strstr(err, "spawn") != NULL, "the error says spawn() is missing");
+
+    err[0] = '\0';
+    n = ScriptSpawn(&p, BASE_W, BASE_H, 0, 0, 1, 0, out, 8, err, sizeof err);
+    check(n < 0 && err[0] == '\0', "the same error is not repeated on the next shot");
+
+    ScriptReload();
+    n = ScriptSpawn(&p, BASE_W, BASE_H, 0, 0, 2, 0, out, 8, err, sizeof err);
+    check(n < 0 && err[0] != '\0', "after ScriptReload() the error is reported again");
+
+    snprintf(p.script, SCRIPT_NAME_MAX, "__t_sandbox");
+    check(ScriptSpawn(&p, BASE_W, BASE_H, 0, 0, 0, 0, out, 8, err, sizeof err) == 1,
+          "scripts cannot reach io, os, require, dofile or loadfile");
+
+    ScriptReload();
+    remove(good);
+    remove(nospawn);
+    remove(sandbox);
+}
+
+/* warn: the default, parsing, a save/load round trip, and a reload that must
+   survive a bad file */
+static PatternSet warn_set;
+
+static void test_warn_and_reload(void)
+{
+    printf("warning before a pattern / reload:\n");
+    Pattern a = pattern_apply_defaults((Pattern){ 0 });
+    a.name = "A";
+    a.origin = ORIGIN_POINT;
+    a.point = (Vector2){ 600, 300 };
+    check(pattern_warn_seconds(&a) == DEFAULT_WARN, "a fixed-point pattern warns by default");
+
+    Pattern b = a;
+    b.name = "B";
+    b.warn = 2.5f;
+    b.warn_radius = 90;
+    check(pattern_warn_seconds(&b) == 2.5f, "an explicit warn is used");
+
+    Pattern c = a;
+    c.name = "C";
+    c.warn = -1.0f;
+    check(pattern_warn_seconds(&c) == 0.0f, "warn off removes the warning");
+
+    Pattern d = pattern_apply_defaults((Pattern){ 0 });
+    d.name = "D";
+    d.origin = ORIGIN_EDGE;
+    check(pattern_warn_seconds(&d) == 0.0f, "other patterns do not warn by default");
+    d.warn = 1.5f;
+    check(pattern_warn_seconds(&d) == 1.5f, "any pattern can ask for a warning");
+
+    const char *tmp = "__shape_test_warn.tmp";
+    Pattern list[4] = { a, b, c, d };
+    check(PatternsSave(tmp, list, 4), "patterns with warn save");
+    char err[256] = { 0 };
+    int n = PatternsLoad(tmp, &warn_set, err, sizeof err);
+    check(n == 4, "they load back");
+    if (n == 4) {
+        const Pattern *r = warn_set.items;
+        check(pattern_warn_seconds(&r[0]) == DEFAULT_WARN, "default warn survives a save/load");
+        check(pattern_warn_seconds(&r[1]) == 2.5f && near(r[1].warn_radius, 90, 1e-3f),
+              "explicit warn and warn_radius survive a save/load");
+        check(pattern_warn_seconds(&r[2]) == 0.0f, "warn off survives a save/load");
+        check(pattern_warn_seconds(&r[3]) == 1.5f, "warn on a non-point pattern survives");
+    }
+
+    /* reload: a bad file must leave the live table alone */
+    check(PatternsLoadRuntime(tmp), "a good file loads into the runtime table");
+    int count = 0;
+    const Pattern *live = PatternsGet(&count);
+    check(count == 4 && strcmp(live[0].name, "A") == 0, "the runtime table has the new patterns and names");
+
+    const char *bad = "__shape_test_bad.tmp";
+    write_text(bad, "pattern x\n  not_a_key 1\nend\n");
+    check(!PatternsLoadRuntime(bad), "a file with a typo is rejected");
+    int count2 = 0;
+    live = PatternsGet(&count2);
+    check(count2 == 4 && strcmp(live[1].name, "B") == 0,
+          "...and the patterns that were loaded stay in use");
+
+    remove(tmp);
+    remove(bad);
+    PatternsReload();   /* put the real table back for anything that runs later */
+}
+
 /* player stats: defaults, a round trip, and a bad value reported */
 static void test_player_stats(void)
 {
@@ -431,6 +590,9 @@ int main(void)
     test_gravity();
     test_alternate();
     test_script();
+    test_wall_scaling();
+    test_script_safety();
+    test_warn_and_reload();
     test_player_stats();
 
     printf("\n%s (%d failure%s)\n",

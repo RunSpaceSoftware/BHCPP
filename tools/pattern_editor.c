@@ -977,7 +977,9 @@ static int check_file(const char *target)
                   (a.segments == b.segments) && same_float(a.length, b.length) &&
                   (strcmp(a.sprite, b.sprite) == 0) &&
                   same_float(a.sprite_size, b.sprite_size) && (a.sprite_rot == b.sprite_rot) &&
-                  same_float(a.gravity, b.gravity) && (strcmp(a.script, b.script) == 0);
+                  same_float(a.gravity, b.gravity) && (strcmp(a.script, b.script) == 0) &&
+                  same_float(pattern_warn_seconds(&a), pattern_warn_seconds(&b)) &&
+                  same_float(a.warn_radius, b.warn_radius);
         if (!ok) {
             printf("pattern %d ('%s') differs from the built-in table\n", i, a.name);
             problems++;
