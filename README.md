@@ -27,8 +27,6 @@ spears, geometric formations, lobbed gravity shells and scripted mortar fire.
   it with `sprite`. The hitbox stays the pattern's `radius`, so art never
   changes how hard a pattern is to dodge. Circles remain the fallback when no
   sprite is set or the file is missing.
-- **Gravity.** A pattern with `gravity` fires shells that arc and fall to the
-  bottom of the arena instead of flying straight.
 - **Editable player.** HP, move speed, size and invulnerability time live in
   `resources/player.txt` and the editor can change them too.
 - **A pattern editor.** `tools/pattern_editor.exe` lists every pattern, previews
@@ -73,7 +71,7 @@ target, which does not link against a desktop raylib.
 
 ## Play
 
-Run `game.exe`. The window can be resized.
+Run `game.exe`.
 
 - Menu: `Up`/`Down` to choose, `Left`/`Right` to change difficulty, `Enter` to
   start, `Esc` to quit.
