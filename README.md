@@ -111,6 +111,21 @@ than by double-clicking it.
 - `resources/scripts/*.lua` - per-pattern scripts, picked with `script`.
 - `tools/make_sprites.py` - regenerates the sample sprites (needs Pillow).
 
+## TODO
+
+- [ ] **Audio support** - music and sound effects for the engine, loaded from
+  `resources/` and driven by the same data files as the patterns.
+- [ ] **Level system** - group patterns into levels and move on to the next one
+  when a level is cleared.
+- [ ] **Better menu and a pause button** - a proper menu, plus pausing mid-game
+  instead of only being able to restart.
+- [ ] **Window-scaled bullet counts** - a mode where the number of bullets
+  follows the window size, so a bigger window means a denser pattern.
+- [ ] **Customizable game over screen** - the death screen's text and look
+  configurable from `resources/`.
+- [ ] **Dialogue system** - text-based conversations, for story lines before or
+  after a level.
+
 ## Licence
 
 The game and its assets are licensed CC BY 4.0 - see `resources/LICENSE`.
