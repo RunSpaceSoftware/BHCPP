@@ -224,10 +224,11 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
         # Build with CONSOLE=1 to keep the console open so raylib's log messages
         # (including why it failed to start) are visible in the terminal.
         ifeq ($(CONSOLE),1)
-            CFLAGS += -Wl,--subsystem,console
+            SUBSYSTEM_FLAG = -Wl,--subsystem,console
         else
-            CFLAGS += -Wl,--subsystem,windows
+            SUBSYSTEM_FLAG = -Wl,--subsystem,windows
         endif
+        CFLAGS += $(SUBSYSTEM_FLAG)
         # the pattern editor keeps its console (it has command line modes)
         EDITOR_LDFLAGS = -Wl,--subsystem,console
     endif
@@ -375,14 +376,21 @@ rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst 
 SRC_DIR = src
 OBJ_DIR = obj
 
-# Define all object files from source files
-# NOTE: tools/ holds separate programs (the pattern editor), never the game
+# The engine - everything the game and the tools share - is built as a DLL so
+# the executables stay thin. raylib is linked into the DLL only: two copies of
+# raylib in one process would mean two GLFW contexts and two global states.
 # NOTE: lua.c/luac.c are standalone interpreters with their own main()
 LUA_DIR = third_party/lua
 LUA_SRC = $(filter-out $(LUA_DIR)/lua.c $(LUA_DIR)/luac.c, $(wildcard $(LUA_DIR)/*.c))
-SRC = $(filter-out ./tools/% ./$(LUA_DIR)/lua.c ./$(LUA_DIR)/luac.c, $(call rwildcard, ./, *.c, *.h))
-#OBJS = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-override OBJS = $(filter %.c,$(SRC))
+ENGINE_SRC = bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
+ENGINE_DLL = bhcpp.dll
+ENGINE_IMPLIB = libbhcpp.dll.a
+RAYLIB_STATIC = $(RAYLIB_RELEASE_PATH)/libraylib.a
+GAME_SRC = main.c
+# the DLL is not a console program, so drop the exe's subsystem flag for it
+# (the flag lives in a variable: a literal comma inside filter-out would split
+# its arguments)
+ENGINE_CFLAGS = $(filter-out $(SUBSYSTEM_FLAG),$(CFLAGS))
 
 # For Android platform we call a custom Makefile.Android
 ifeq ($(PLATFORM),PLATFORM_ANDROID)
@@ -398,9 +406,20 @@ endif
 all:
 	$(MAKE) $(MAKEFILE_PARAMS)
 
-# Project target defined by PROJECT_NAME
-$(PROJECT_NAME): $(OBJS) $(WIN_RES)
-	$(CC) -o $(PROJECT_NAME)$(EXT) $(OBJS) $(WIN_RES) $(WIN_LDFLAGS) $(CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
+# The engine DLL. --whole-archive pulls every raylib object in (not just the
+# ones the engine itself calls) because the executables import raylib through
+# it too, and --export-all-symbols makes them importable.
+$(ENGINE_DLL): $(ENGINE_SRC)
+	$(CC) -shared -o $(ENGINE_DLL) $(ENGINE_SRC) $(WIN_LDFLAGS) $(ENGINE_CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) \
+		-Wl,--whole-archive $(RAYLIB_STATIC) -Wl,--no-whole-archive \
+		-lopengl32 -lgdi32 -lwinmm \
+		-Wl,--out-implib,$(ENGINE_IMPLIB) -Wl,--export-all-symbols -D$(PLATFORM)
+
+engine: $(ENGINE_DLL)
+
+# Project target defined by PROJECT_NAME: main.c plus the engine DLL
+$(PROJECT_NAME): $(GAME_SRC) $(ENGINE_DLL) $(WIN_RES)
+	$(CC) -o $(PROJECT_NAME)$(EXT) $(GAME_SRC) $(WIN_RES) $(CFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
 
 # Compile the Windows resource script (icon + version metadata) into a COFF
 # object the linker embeds in the executable. Re-runs whenever the script or
@@ -414,10 +433,11 @@ endif
 # the game reads at start-up). It is not part of the game binary.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP editor
 #   run:   tools/pattern_editor.exe
-EDITOR_SRC = tools/pattern_editor.c bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
+EDITOR_SRC = tools/pattern_editor.c
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
-editor: $(EDITOR_SRC) $(WIN_RES)
-	$(CC) -o tools/pattern_editor$(EXT) $(EDITOR_SRC) $(WIN_RES) $(WIN_LDFLAGS) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
+editor: $(EDITOR_SRC) $(ENGINE_DLL) $(WIN_RES)
+	$(CC) -o tools/pattern_editor$(EXT) $(EDITOR_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
+	@cp -f $(ENGINE_DLL) tools/
 else
     # The editor is a desktop tool; PLATFORM at the top of this Makefile points
     # elsewhere, so just say how to build it instead of failing with emcc.
@@ -430,10 +450,11 @@ endif
 # and formation spawn code. No window is created, so it runs anywhere.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest
 #   run:   tools/shape_test.exe
-SHAPETEST_SRC = tools/shape_test.c bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
+SHAPETEST_SRC = tools/shape_test.c
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
-shapetest: $(SHAPETEST_SRC) $(WIN_RES)
-	$(CC) -o tools/shape_test$(EXT) $(SHAPETEST_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) $(LDLIBS) -D$(PLATFORM)
+shapetest: $(SHAPETEST_SRC) $(ENGINE_DLL) $(WIN_RES)
+	$(CC) -o tools/shape_test$(EXT) $(SHAPETEST_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
+	@cp -f $(ENGINE_DLL) tools/
 else
 shapetest:
 	@echo "The shape tests are a desktop tool; build them with:"
@@ -443,7 +464,7 @@ endif
 # Build every tool and run all the headless checks in one go:
 #   mingw32-make PLATFORM=PLATFORM_DESKTOP check
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
-check: editor shapetest
+check: $(PROJECT_NAME) editor shapetest
 	@echo "--- shape tests ---"
 	@tools/shape_test$(EXT)
 	@echo "--- patterns.txt vs built-in table ---"
@@ -466,7 +487,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 clean:
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(PLATFORM_OS),WINDOWS)
-		del *.o *.exe *.rc.data /s
+		# recipes run through sh here, so this is rm, not cmd's del
+		rm -f *.o *.exe *.rc.data *.dll *.dll.a tools/*.exe tools/*.dll
     endif
     ifeq ($(PLATFORM_OS),LINUX)
 	find -type f -executable | xargs file -i | grep -E 'x-object|x-archive|x-sharedlib|x-executable' | rev | cut -d ':' -f 2- | rev | xargs rm -fv

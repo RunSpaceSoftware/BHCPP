@@ -61,13 +61,25 @@ Lua is the one dependency you do *not* install: 5.4.7 is vendored in
 ## Build
 
 ```
-mingw32-make PLATFORM=PLATFORM_DESKTOP            # game.exe
+mingw32-make PLATFORM=PLATFORM_DESKTOP            # bhcpp.dll + game.exe
 mingw32-make PLATFORM=PLATFORM_DESKTOP editor     # tools/pattern_editor.exe
 mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest  # tools/shape_test.exe
 ```
 
 `PLATFORM=PLATFORM_DESKTOP` is required. The Makefile defaults to the web
 target, which does not link against a desktop raylib.
+
+## The engine DLL
+
+The engine - patterns, spawning, Lua scripting, player stats - is built as
+`bhcpp.dll`, together with raylib and Lua. `game.exe` is only `main.c` and
+imports everything from the DLL, which keeps the engine reusable by anything
+else that wants to link `libbhcpp.dll.a`.
+
+DLL and executables must stay together: `bhcpp.dll` sits next to `game.exe`, and
+the build copies a second one into `tools/` for the editor and the tests. raylib
+is linked into the DLL only - a second copy in an executable would mean two
+GLFW contexts and two copies of raylib's global state.
 
 ## Play
 

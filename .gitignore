@@ -4,6 +4,10 @@
 # Object files
 *.o
 
+# build output: the engine DLL and its import library
+*.dll
+*.dll.a
+
 # VS Code settings folder
 .vscode/
 
@@ -16,3 +20,6 @@ game.rc.data
 
 # scratch harnesses / temp exports
 tools/_*
+
+# commit-message scratch
+_msg.txt
