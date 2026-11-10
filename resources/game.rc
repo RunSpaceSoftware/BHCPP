@@ -1,0 +1,79 @@
+/* ==========================================================================
+ *  resources/game.rc  --  Windows executable metadata and icon
+ *
+ *  This is the file to edit when you want to change what Windows shows for
+ *  the built .exe: the icon in Explorer, and everything under
+ *  right-click -> Properties -> Details.
+ *
+ *  The Makefile compiles this file with windres on every Windows build and
+ *  links the result into the executable, so whatever is here is what the
+ *  next build of main.exe / game.exe will carry.
+ *
+ *  Rebuild:  mingw32-make PLATFORM=PLATFORM_DESKTOP
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ *  Version numbers - the only place a version is written.
+ *
+ *  They feed both the numeric version (FILEVERSION / PRODUCTVERSION, which is
+ *  what Windows compares) and the "File version" / "Product version" text in
+ *  the Details tab, so the two can never disagree.
+ * -------------------------------------------------------------------------- */
+#define VER_MAJOR 1
+#define VER_MINOR 0
+#define VER_PATCH 0
+#define VER_BUILD 0
+
+/* Turns the four numbers above into the dotted text version. Leave as is. */
+#define RC_STR_(x)  #x
+#define RC_STR(x)   RC_STR_(x)
+#define VERSION_STR RC_STR(VER_MAJOR) "." RC_STR(VER_MINOR) "." RC_STR(VER_PATCH) "." RC_STR(VER_BUILD)
+
+/* --------------------------------------------------------------------------
+ *  Icon - used by Explorer, the taskbar and window borders.
+ *
+ *  The name GLFW_ICON is not cosmetic: on Windows, GLFW looks the window-class
+ *  icon up by that exact name (LoadImageW(GetModuleHandle(NULL), L"GLFW_ICON",
+ *  ...)) and falls back to the generic application icon when it is missing.
+ *  raylib's own raylib.rc does the same, which is why this must stay GLFW_ICON
+ *  for the game window / taskbar to show your icon.
+ *
+ *  windres is given -I resources, so the bare file name is found next to
+ *  this script.
+ * -------------------------------------------------------------------------- */
+GLFW_ICON ICON "icon.ico"
+
+/* --------------------------------------------------------------------------
+ *  Version information block, shown in the Details tab.
+ *
+ *  0x0409 = English (United States)
+ *  1200   = Unicode code page
+ * -------------------------------------------------------------------------- */
+1 VERSIONINFO
+FILEVERSION     VER_MAJOR, VER_MINOR, VER_PATCH, VER_BUILD
+PRODUCTVERSION  VER_MAJOR, VER_MINOR, VER_PATCH, VER_BUILD
+FILEFLAGSMASK   0x3fL
+FILEFLAGS       0x0L
+FILEOS          0x40004L        /* VOS_NT_WINDOWS32 */
+FILETYPE        0x1L            /* VFT_APP */
+FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName",      "RunSpace"
+            VALUE "FileDescription",  "Bullet Hell"
+            VALUE "FileVersion",      VERSION_STR
+            VALUE "InternalName",     "game"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 RunSpace"
+            VALUE "OriginalFilename", "game.exe"
+            VALUE "ProductName",      "Bullet Hell"
+            VALUE "ProductVersion",   VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
