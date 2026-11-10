@@ -80,6 +80,15 @@ static void load_player_stats(void);   /* defined with the player block below */
 
 static RenderTexture2D canvas;
 
+/* The UI is always drawn at its design size and scaled to whatever the window
+   is, so resizing never has to reflow the fixed grid. */
+static Camera2D ui_cam = { { 0, 0 }, { 0, 0 }, 0.0f, 1.0f };
+
+static Vector2 ui_mouse(void)
+{
+    return GetScreenToWorld2D(GetMousePosition(), ui_cam);
+}
+
 static BulletList bullets;
 static SpinState  spin;
 static float      shot_timer = 0.0f;
@@ -330,7 +339,7 @@ static Rectangle prop_row(int index)
 
 static bool mouse_on(Rectangle r)
 {
-    return CheckCollisionPointRec(GetMousePosition(), r);
+    return CheckCollisionPointRec(ui_mouse(), r);
 }
 
 static void draw_row_text(Rectangle r, const char *label, const char *value)
@@ -349,7 +358,7 @@ static bool slider_f(const char *label, int index, float *value, float lo, float
     Rectangle bar = { r.x + 122, r.y + 14, r.width - 196, 9 };
 
     bool changed = false;
-    Vector2 m = GetMousePosition();
+    Vector2 m = ui_mouse();
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && mouse_on(bar)) drag_id = index;
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && drag_id == index) drag_id = -1;
@@ -388,7 +397,7 @@ static bool slider_i(const char *label, int index, int *value, int lo, int hi)
     Rectangle bar = { r.x + 122, r.y + 14, r.width - 196, 9 };
 
     bool changed = false;
-    Vector2 m = GetMousePosition();
+    Vector2 m = ui_mouse();
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && mouse_on(bar)) drag_id = index;
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && drag_id == index) drag_id = -1;
@@ -535,7 +544,9 @@ static bool button(Rectangle r, const char *text, bool enabled)
 }
 
 /* ------------------------------------------------------------- preview */
-static void draw_canvas(void)
+/* The arena goes into its own texture before the UI pass: switching render
+   targets inside the camera pass would retarget the rest of the UI. */
+static void render_canvas(void)
 {
     BeginTextureMode(canvas);
     ClearBackground((Color){ 8, 8, 12, 255 });
@@ -553,7 +564,10 @@ static void draw_canvas(void)
 
     DrawRectangleLines(0, 0, ARENA_W, ARENA_H, (Color){ 50, 50, 70, 255 });
     EndTextureMode();
+}
 
+static void draw_canvas(void)
+{
     DrawTexturePro(canvas.texture,
                    (Rectangle){ 0, 0, (float)ARENA_W, (float)-ARENA_H },
                    (Rectangle){ (float)CANVAS_X, (float)CANVAS_Y, (float)CANVAS_W, (float)CANVAS_H },
@@ -687,7 +701,7 @@ static void draw_info(void)
     }
 
     DrawText("Space: pause    R: restart    Up/Down: previous / next",
-             CANVAS_X, GetScreenHeight() - 30, 15, C_DIM);
+             CANVAS_X, WIN_H - 30, 15, C_DIM);
 }
 
 /* ------------------------------------------------------------ player block */
@@ -867,7 +881,7 @@ static void update_sim(void)
     float dt = GetFrameTime();
     if (dt > 0.05f) dt = 0.05f;
 
-    Vector2 m = GetMousePosition();
+    Vector2 m = ui_mouse();
     if (m.x >= CANVAS_X && m.x < CANVAS_X + CANVAS_W && m.y >= CANVAS_Y && m.y < CANVAS_Y + CANVAS_H) {
         player_x = (m.x - CANVAS_X) / CANVAS_SCALE;
         player_y = (m.y - CANVAS_Y) / CANVAS_SCALE;
@@ -1059,7 +1073,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "error: could not create a window\n");
         return 1;
     }
-    SetWindowMinSize(WIN_W, WIN_H);   /* the layout below is a fixed grid */
+    SetWindowMinSize(640, 400);       /* the UI scales down to this */
     SetExitKey(KEY_NULL);
     SetTargetFPS(60);
 
@@ -1068,7 +1082,20 @@ int main(int argc, char **argv)
     canvas = LoadRenderTexture(ARENA_W, ARENA_H);
     SetTextureFilter(canvas.texture, TEXTURE_FILTER_BILINEAR);
 
+    /* a 1500x880 window does not fit every screen: start at most that tall */
+    int mon_h = GetMonitorHeight(GetCurrentMonitor());
+    if (mon_h > 0 && WIN_H > mon_h - 90) {
+        float k = (mon_h - 90) / (float)WIN_H;
+        SetWindowSize((int)(WIN_W * k), (int)(WIN_H * k));
+    }
+
     while (!WindowShouldClose()) {
+        /* fit the design-sized UI into the window, letterboxed */
+        float sw = (float)GetScreenWidth(), sh = (float)GetScreenHeight();
+        float z = fminf(sw / (float)WIN_W, sh / (float)WIN_H);
+        ui_cam.zoom = z;
+        ui_cam.offset = (Vector2){ (sw - WIN_W * z) * 0.5f, (sh - WIN_H * z) * 0.5f };
+
         if (editing_name) {
             handle_name_input();
         } else {
@@ -1081,9 +1108,11 @@ int main(int argc, char **argv)
         }
 
         update_sim();
+        render_canvas();          /* its own render target, before the camera */
 
         BeginDrawing();
-        ClearBackground(C_BG);
+        ClearBackground(C_BG);    /* also the letterbox bars */
+        BeginMode2D(ui_cam);
 
         DrawText("BULLET HELL  -  pattern editor", LIST_X, 22, 22, C_ACCENT);
         DrawText("patterns.txt", LIST_X, 46, 14, C_DIM);
@@ -1094,6 +1123,7 @@ int main(int argc, char **argv)
         draw_player_panel();
         draw_panel();
 
+        EndMode2D();
         EndDrawing();
     }
 
