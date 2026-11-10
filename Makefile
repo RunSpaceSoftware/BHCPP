@@ -383,6 +383,10 @@ OBJ_DIR = obj
 LUA_DIR = third_party/lua
 LUA_SRC = $(filter-out $(LUA_DIR)/lua.c $(LUA_DIR)/luac.c, $(wildcard $(LUA_DIR)/*.c))
 ENGINE_SRC = bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
+# The DLL and the executables share structs such as Pattern. A header change
+# must rebuild the DLL too, otherwise a rebuilt exe and a stale DLL disagree
+# about where the fields are.
+ENGINE_HDR = $(wildcard *.h $(LUA_DIR)/*.h)
 ENGINE_DLL = bhcpp.dll
 ENGINE_IMPLIB = libbhcpp.dll.a
 RAYLIB_STATIC = $(RAYLIB_RELEASE_PATH)/libraylib.a
@@ -409,7 +413,7 @@ all:
 # The engine DLL. --whole-archive pulls every raylib object in (not just the
 # ones the engine itself calls) because the executables import raylib through
 # it too, and --export-all-symbols makes them importable.
-$(ENGINE_DLL): $(ENGINE_SRC)
+$(ENGINE_DLL): $(ENGINE_SRC) $(ENGINE_HDR) $(RAYLIB_STATIC)
 	$(CC) -shared -o $(ENGINE_DLL) $(ENGINE_SRC) $(WIN_LDFLAGS) $(ENGINE_CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) \
 		-Wl,--whole-archive $(RAYLIB_STATIC) -Wl,--no-whole-archive \
 		-lopengl32 -lgdi32 -lwinmm \
@@ -418,7 +422,7 @@ $(ENGINE_DLL): $(ENGINE_SRC)
 engine: $(ENGINE_DLL)
 
 # Project target defined by PROJECT_NAME: main.c plus the engine DLL
-$(PROJECT_NAME): $(GAME_SRC) $(ENGINE_DLL) $(WIN_RES)
+$(PROJECT_NAME): $(GAME_SRC) $(ENGINE_HDR) $(ENGINE_DLL) $(WIN_RES)
 	$(CC) -o $(PROJECT_NAME)$(EXT) $(GAME_SRC) $(WIN_RES) $(CFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
 
 # Compile the Windows resource script (icon + version metadata) into a COFF

@@ -14,9 +14,8 @@
 # Your custom folder (I assume you meant .dsh)
 .dsh/
 
-# Resource files
-*.rc
-game.rc.data
+# windres turns resources/game.rc (tracked) into this compiled resource object
+*.rc.data
 
 # scratch harnesses / temp exports
 tools/_*
