@@ -3,8 +3,9 @@
 A small bullet-hell engine and playable demo, written in C99 on top of
 [raylib](https://www.raylib.com/). Everything that makes the game interesting is
 meant to be tuned without touching C: the attack patterns, the bullets
-themselves, and the player's own numbers all live in plain files under
-`resources/`, and a standalone editor edits them while you watch the result.
+themselves, the sounds, and the player's own numbers all live in plain files
+under `resources/`, and a standalone editor edits them while you watch the
+result.
 
 Bullet-hell in this sense is a top-down dodging game: enemies never appear, the
 arena simply fills with overlapping patterns of projectiles and the player stays
@@ -27,9 +28,12 @@ spears, geometric formations, lobbed gravity shells and scripted mortar fire.
   it with `sprite`. The hitbox stays the pattern's `radius`, so art never
   changes how hard a pattern is to dodge. Circles remain the fallback when no
   sprite is set or the file is missing.
+- **Sounds as data.** Drop a `.wav` or `.ogg` into `resources/` and give a
+  pattern `sound shoot.wav`; it plays on every shot of that pattern. A missing
+  file or a machine with no sound card just stays silent.
 - **Editable player.** HP, move speed, size and invulnerability time live in
   `resources/player.txt` and the editor can change them too.
-- **A pattern editor.** `tools/pattern_editor.exe` lists every pattern, previews
+- **A pattern editor.** `build/pattern_editor.exe` lists every pattern, previews
   it live against a movable player marker, and exposes all of its fields as
   sliders and pickers, plus a sprite picker filled from the PNGs you have
   dropped in.
@@ -61,36 +65,49 @@ Lua is the one dependency you do *not* install: 5.4.7 is vendored in
 ## Build
 
 ```
-mingw32-make PLATFORM=PLATFORM_DESKTOP            # bhcpp.dll + game.exe
-mingw32-make PLATFORM=PLATFORM_DESKTOP editor     # tools/pattern_editor.exe
-mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest  # tools/shape_test.exe
+mingw32-make PLATFORM=PLATFORM_DESKTOP            # build/bhcpp.dll + build/game.exe
+mingw32-make PLATFORM=PLATFORM_DESKTOP editor     # build/pattern_editor.exe
+mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest  # build/shape_test.exe
 ```
 
 `PLATFORM=PLATFORM_DESKTOP` is required. The Makefile defaults to the web
 target, which does not link against a desktop raylib.
 
+Everything lands in `build/`, including the intermediate `.o` files. Sources are
+`src/*.c`, headers are `libs/*.h`.
+
+Each build also copies the assets the game loads - the PNGs, `patterns.txt`,
+`player.txt`, `scripts/*.lua` and the asset `LICENSE` - into `build/resources/`,
+so `build/` is self-contained and can be zipped and run anywhere. The copy is
+refreshed whenever an asset changes and starts from a clean folder, so an asset
+deleted from `resources/` disappears from `build/resources/` too.
+`resources/game.rc` and `resources/icon.ico` are build inputs, not assets, and
+stay out of the copy.
+
 ## The engine DLL
 
 The engine - patterns, spawning, Lua scripting, player stats - is built as
-`bhcpp.dll`, together with raylib and Lua. `game.exe` is only `main.c` and
-imports everything from the DLL, which keeps the engine reusable by anything
-else that wants to link `libbhcpp.dll.a`.
+`build/bhcpp.dll`, together with raylib and Lua. `build/game.exe` is only
+`src/main.c` and imports everything from the DLL, which keeps the engine
+reusable by anything else that wants to link `build/libbhcpp.dll.a`.
 
-DLL and executables must stay together: `bhcpp.dll` sits next to `game.exe`, and
-the build copies a second one into `tools/` for the editor and the tests. raylib
-is linked into the DLL only - a second copy in an executable would mean two
-GLFW contexts and two copies of raylib's global state.
+DLL and executables must stay together, so every executable is written into
+`build/` next to `bhcpp.dll` - the game, the editor and the shape tests alike.
+raylib is linked into the DLL only - a second copy in an executable would mean
+two GLFW contexts and two copies of raylib's global state.
 
 ## Play
 
-Run `game.exe`.
+Run `build/game.exe`. It finds its assets in `build/resources/`; if that folder
+is missing the loaders look one folder up and then in the current directory, so
+running an executable straight from `build/` inside the repo still works.
 
 - Menu: `Up`/`Down` to choose, `Left`/`Right` to change difficulty, `Enter` to
   start, `Esc` to quit.
 - In game: arrow keys to move, `R` to restart after game over, `Esc` for the
-  menu, `F5` to reload patterns, sprites, scripts and player stats without
-  restarting. If `patterns.txt` has a typo, F5 says so on the menu and keeps
-  the patterns you already had.
+  menu, `F5` to reload patterns, sprites, sounds, scripts and player stats
+  without restarting. If `patterns.txt` has a typo, F5 says so on the menu and
+  keeps the patterns you already had.
 - Patterns that fire from a fixed point (rings, spirals, lattices) flash a
   warning circle for a second first, so you can get off the spot. Set `warn`
   and `warn_radius` per pattern in `patterns.txt` (`warn off` removes it).
@@ -99,8 +116,18 @@ Run `game.exe`.
 
 ## Edit
 
-Run `tools/pattern_editor.exe` from a terminal (it is a console program, so
+Run `build/pattern_editor.exe` from the repo root (it is a console program, so
 messages like "could not write ..." stay visible).
+
+Because the editor sits next to the copied assets, `Ctrl+S` writes
+`build/resources/patterns.txt` and `build/resources/player.txt` - the copy the
+game next to it reads, so you can save and press `F5` in the game. To write the
+tracked files instead, pass the path, and rebuild so the copy picks the change
+up:
+
+```
+build/pattern_editor.exe resources/patterns.txt
+```
 
 - Click a pattern in the list to preview it; move the mouse over the arena to
   move the player marker the patterns aim at.
@@ -118,14 +145,21 @@ mingw32-make PLATFORM=PLATFORM_DESKTOP check
 
 Builds everything and runs three checks: the shape/script/stats tests,
 `patterns.txt` against the built-in table, and the editor panel-fit check.
-`tools/shape_test.exe` prints its results, so run it from a terminal rather
-than by double-clicking it.
+Run it from the repo root - the stats test writes its scratch files into
+`tools/`. The script test writes three throwaway `.lua` files into the folder
+the engine actually reads, `build/resources/scripts`, and deletes them again.
+`build/shape_test.exe` prints its results, so run it from a terminal rather than
+by double-clicking it.
 
 ## Files
 
-- `resources/patterns.txt` - the patterns; `patterns_io.h` documents every key.
+- `src/*.c` - the engine and the game; `build/game.exe` is `src/main.c` only.
+- `libs/*.h` - the engine headers; `libs/patterns_io.h` documents every key of
+  `patterns.txt`.
+- `resources/patterns.txt` - the patterns.
 - `resources/player.txt` - hp, speed, size, invuln.
 - `resources/*.png` - bullet sprites, picked per pattern with `sprite`.
+- `resources/*.wav` - sound effects, picked per pattern with `sound`.
 - `resources/scripts/aims.lua` - spawn logic for the built-in aims.
 - `resources/scripts/*.lua` - per-pattern scripts, picked with `script`.
   Scripts only get the base, coroutine, table, string, math and utf8
@@ -135,8 +169,8 @@ than by double-clicking it.
 
 ## TODO
 
-- [ ] **Audio support** - music and sound effects for the engine, loaded from
-  `resources/` and driven by the same data files as the patterns.
+- [ ] **Music** - a background track for the engine, loaded from `resources/`
+  like the sound effects.
 - [ ] **Level system** - group patterns into levels and move on to the next one
   when a level is cleared.
 - [ ] **Better menu and a pause button** - a proper menu, plus pausing mid-game

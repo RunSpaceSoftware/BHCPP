@@ -414,14 +414,37 @@ static bool write_text(const char *path, const char *text)
     return true;
 }
 
+/* The scripts folder the engine will actually read: next to the executable
+   first, because the build copies resources/ in there, then one level up, then
+   the cwd - the same order as src/pattern_script.c. Scratch scripts have to be
+   written where the engine looks, not just where the repo keeps the originals. */
+static const char *scripts_dir(void)
+{
+    static char dir[4096];
+    const char *app = GetApplicationDirectory();
+    const char *cand[3] = { "%sresources/scripts", "%s../resources/scripts", "resources/scripts" };
+    char probe[4096];
+
+    for (int i = 0; i < 3; i++) {
+        snprintf(probe, sizeof probe, cand[i], (i == 2) ? "" : app);
+        if (!DirectoryExists(probe)) continue;
+        snprintf(dir, sizeof dir, "%s", probe);
+        return dir;
+    }
+    snprintf(dir, sizeof dir, "resources/scripts");   /* let the write fail loudly */
+    return dir;
+}
+
 /* scripts: one that forgets spawn(), the error being reported once, and the
-   sandbox. Writes (and removes) throwaway files in resources/scripts. */
+   sandbox. Writes (and removes) throwaway files in the scripts folder. */
 static void test_script_safety(void)
 {
     printf("script safety:\n");
-    const char *good = "resources/scripts/__t_good.lua";
-    const char *nospawn = "resources/scripts/__t_nospawn.lua";
-    const char *sandbox = "resources/scripts/__t_sandbox.lua";
+    char good[4096], nospawn[4096], sandbox[4096];
+    const char *dir = scripts_dir();
+    snprintf(good, sizeof good, "%s/__t_good.lua", dir);
+    snprintf(nospawn, sizeof nospawn, "%s/__t_nospawn.lua", dir);
+    snprintf(sandbox, sizeof sandbox, "%s/__t_sandbox.lua", dir);
     bool wrote = write_text(good, "function spawn(c) return {{x=1,y=1,angle=0,speed=1}} end\n") &&
                  write_text(nospawn, "-- forgot to define spawn\nlocal x = 1\n") &&
                  write_text(sandbox,
@@ -433,7 +456,7 @@ static void test_script_safety(void)
                      "  end\n"
                      "  return {}\n"
                      "end\n");
-    check(wrote, "wrote the throwaway test scripts (run from the repo root)");
+    check(wrote, "wrote the throwaway test scripts");
 
     ScriptReload();
     ShotSpec out[8];
@@ -481,6 +504,7 @@ static void test_warn_and_reload(void)
     a.name = "A";
     a.origin = ORIGIN_POINT;
     a.point = (Vector2){ 600, 300 };
+    snprintf(a.sound, SOUND_NAME_MAX, "shot.wav");
     check(pattern_warn_seconds(&a) == DEFAULT_WARN, "a fixed-point pattern warns by default");
 
     Pattern b = a;
@@ -514,6 +538,7 @@ static void test_warn_and_reload(void)
               "explicit warn and warn_radius survive a save/load");
         check(pattern_warn_seconds(&r[2]) == 0.0f, "warn off survives a save/load");
         check(pattern_warn_seconds(&r[3]) == 1.5f, "warn on a non-point pattern survives");
+        check(strcmp(r[0].sound, "shot.wav") == 0, "a pattern's sound survives a save/load");
     }
 
     /* reload: a bad file must leave the live table alone */

@@ -8,6 +8,9 @@
 *.dll
 *.dll.a
 
+# everything the build writes, relocated out of the source tree
+build/
+
 # VS Code settings folder
 .vscode/
 

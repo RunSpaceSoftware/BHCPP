@@ -28,6 +28,25 @@ PROJECT_NAME       ?= game
 RAYLIB_VERSION     ?= 6.2
 RAYLIB_PATH =      C:/raylib/raylib
 
+# Project layout: the project's own sources live in src/, its headers in libs/,
+# and everything the build produces (DLL, import library, exe, tools, the
+# compiled .rc object) lands in build/. Only the Makefiles, the .md files and
+# the .code-workspace stay in the root.
+SRC_DIR = src
+LIB_DIR = libs
+BUILD_DIR = build
+
+# The game reads its assets from resources/ next to the executable, so each
+# build copies them into build/resources/ and build/ becomes self-contained.
+# NOTE: resources/game.rc and resources/icon.ico are build inputs, not assets,
+# so they stay out of the copy.
+RES_DIR = resources
+RES_TOP = $(wildcard $(RES_DIR)/*.png $(RES_DIR)/*.wav $(RES_DIR)/*.ogg) \
+          $(RES_DIR)/patterns.txt $(RES_DIR)/player.txt $(RES_DIR)/LICENSE
+RES_SCRIPTS = $(wildcard $(RES_DIR)/scripts/*.lua)
+RES_FILES = $(RES_TOP) $(RES_SCRIPTS)
+RES_DEST = $(BUILD_DIR)/$(RES_DIR)
+
 # Windows resource script: executable icon + version metadata.
 # Edit resources/game.rc to change the name, company, copyright or version that
 # ends up in the built .exe. Only used on Windows.
@@ -215,7 +234,7 @@ ifeq ($(PLATFORM),PLATFORM_DESKTOP)
         # resources/game.rc contains the windows executable icon and properties.
         # windres turns it into WIN_RES, a COFF object the link step embeds;
         # this replaces raylib's default raylib.rc.data.
-        WIN_RES = game.rc.data
+        WIN_RES = $(BUILD_DIR)/game.rc.data
         # Skip GLFW's joystick/DirectInput subsystem: on a machine where
         # DirectInput is unavailable, its lazy init leaves a GLFW error behind
         # that makes raylib think the graphics device failed (see main.c).
@@ -274,7 +293,7 @@ endif
 
 # Define include paths for required headers
 # NOTE: Several external required libraries (stb and others)
-INCLUDE_PATHS = -I. -I$(RAYLIB_PATH)/src -I$(RAYLIB_PATH)/src/external -Ithird_party/lua
+INCLUDE_PATHS = -I$(LIB_DIR) -I. -I$(RAYLIB_PATH)/src -I$(RAYLIB_PATH)/src/external -Ithird_party/lua
 
 # Define additional directories containing required header files
 ifeq ($(PLATFORM),PLATFORM_RPI)
@@ -373,8 +392,7 @@ endif
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
 # Define all source files required
-SRC_DIR = src
-OBJ_DIR = obj
+OBJ_DIR = $(BUILD_DIR)/obj
 
 # The engine - everything the game and the tools share - is built as a DLL so
 # the executables stay thin. raylib is linked into the DLL only: two copies of
@@ -382,15 +400,16 @@ OBJ_DIR = obj
 # NOTE: lua.c/luac.c are standalone interpreters with their own main()
 LUA_DIR = third_party/lua
 LUA_SRC = $(filter-out $(LUA_DIR)/lua.c $(LUA_DIR)/luac.c, $(wildcard $(LUA_DIR)/*.c))
-ENGINE_SRC = bullet.c patterns.c patterns_io.c pattern_script.c player_stats.c platform_compat.c $(LUA_SRC)
+ENGINE_SRC = $(addprefix $(SRC_DIR)/,bullet.c patterns.c patterns_io.c pattern_script.c \
+             player_stats.c platform_compat.c audio.c) $(LUA_SRC)
 # The DLL and the executables share structs such as Pattern. A header change
 # must rebuild the DLL too, otherwise a rebuilt exe and a stale DLL disagree
 # about where the fields are.
-ENGINE_HDR = $(wildcard *.h $(LUA_DIR)/*.h)
-ENGINE_DLL = bhcpp.dll
-ENGINE_IMPLIB = libbhcpp.dll.a
+ENGINE_HDR = $(wildcard $(LIB_DIR)/*.h $(LUA_DIR)/*.h)
+ENGINE_DLL = $(BUILD_DIR)/bhcpp.dll
+ENGINE_IMPLIB = $(BUILD_DIR)/libbhcpp.dll.a
 RAYLIB_STATIC = $(RAYLIB_RELEASE_PATH)/libraylib.a
-GAME_SRC = main.c
+GAME_SRC = $(SRC_DIR)/main.c
 # the DLL is not a console program, so drop the exe's subsystem flag for it
 # (the flag lives in a variable: a literal comma inside filter-out would split
 # its arguments)
@@ -410,10 +429,23 @@ endif
 all:
 	$(MAKE) $(MAKEFILE_PARAMS)
 
+# Everything is written into build/, so make sure it exists first
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+# Copy the assets next to the executables, keeping the scripts/ subfolder, and
+# drop anything that was deleted from resources/ by starting from a clean
+# folder. Re-runs whenever an asset changes.
+$(RES_DEST): $(RES_FILES) | $(BUILD_DIR)
+	rm -rf $@
+	mkdir -p $@/scripts
+	cp -f $(RES_TOP) $@/
+	@for f in $(RES_SCRIPTS); do cp -f $$f $@/scripts/; done
+
 # The engine DLL. --whole-archive pulls every raylib object in (not just the
 # ones the engine itself calls) because the executables import raylib through
 # it too, and --export-all-symbols makes them importable.
-$(ENGINE_DLL): $(ENGINE_SRC) $(ENGINE_HDR) $(RAYLIB_STATIC)
+$(ENGINE_DLL): $(ENGINE_SRC) $(ENGINE_HDR) $(RAYLIB_STATIC) | $(BUILD_DIR)
 	$(CC) -shared -o $(ENGINE_DLL) $(ENGINE_SRC) $(WIN_LDFLAGS) $(ENGINE_CFLAGS) $(INCLUDE_PATHS) $(LDFLAGS) \
 		-Wl,--whole-archive $(RAYLIB_STATIC) -Wl,--no-whole-archive \
 		-lopengl32 -lgdi32 -lwinmm \
@@ -421,27 +453,27 @@ $(ENGINE_DLL): $(ENGINE_SRC) $(ENGINE_HDR) $(RAYLIB_STATIC)
 
 engine: $(ENGINE_DLL)
 
-# Project target defined by PROJECT_NAME: main.c plus the engine DLL
-$(PROJECT_NAME): $(GAME_SRC) $(ENGINE_HDR) $(ENGINE_DLL) $(WIN_RES)
-	$(CC) -o $(PROJECT_NAME)$(EXT) $(GAME_SRC) $(WIN_RES) $(CFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
+# Project target defined by PROJECT_NAME: src/main.c plus the engine DLL
+$(PROJECT_NAME): $(GAME_SRC) $(ENGINE_HDR) $(ENGINE_DLL) $(WIN_RES) $(RES_DEST)
+	$(CC) -o $(BUILD_DIR)/$(PROJECT_NAME)$(EXT) $(GAME_SRC) $(WIN_RES) $(CFLAGS) $(INCLUDE_PATHS) -L$(BUILD_DIR) -lbhcpp -D$(PLATFORM)
 
 # Compile the Windows resource script (icon + version metadata) into a COFF
 # object the linker embeds in the executable. Re-runs whenever the script or
 # the icon next to it changes.
 ifneq ($(WIN_RES),)
-$(WIN_RES): $(RES_SRC) $(dir $(RES_SRC))icon.ico
+$(WIN_RES): $(RES_SRC) $(dir $(RES_SRC))icon.ico | $(BUILD_DIR)
 	$(WINDRES) -I $(dir $(RES_SRC)) $< -O coff -o $@
 endif
 
 # Pattern editor: a separate tool that edits resources/patterns.txt (the file
-# the game reads at start-up). It is not part of the game binary.
+# the game reads at start-up). It is not part of the game binary and lives in
+# build/ next to the DLL it imports.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP editor
-#   run:   tools/pattern_editor.exe
+#   run:   build/pattern_editor.exe
 EDITOR_SRC = tools/pattern_editor.c
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
-editor: $(EDITOR_SRC) $(ENGINE_DLL) $(WIN_RES)
-	$(CC) -o tools/pattern_editor$(EXT) $(EDITOR_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
-	@cp -f $(ENGINE_DLL) tools/
+editor: $(EDITOR_SRC) $(ENGINE_DLL) $(WIN_RES) $(RES_DEST) | $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/pattern_editor$(EXT) $(EDITOR_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) -L$(BUILD_DIR) -lbhcpp -D$(PLATFORM)
 else
     # The editor is a desktop tool; PLATFORM at the top of this Makefile points
     # elsewhere, so just say how to build it instead of failing with emcc.
@@ -453,28 +485,28 @@ endif
 # Shape tests: a headless console tool that checks the geometry of the spear
 # and formation spawn code. No window is created, so it runs anywhere.
 #   build: mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest
-#   run:   tools/shape_test.exe
+#   run:   build/shape_test.exe
 SHAPETEST_SRC = tools/shape_test.c
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
-shapetest: $(SHAPETEST_SRC) $(ENGINE_DLL) $(WIN_RES)
-	$(CC) -o tools/shape_test$(EXT) $(SHAPETEST_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) -L. -lbhcpp -D$(PLATFORM)
-	@cp -f $(ENGINE_DLL) tools/
+shapetest: $(SHAPETEST_SRC) $(ENGINE_DLL) $(WIN_RES) $(RES_DEST) | $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/shape_test$(EXT) $(SHAPETEST_SRC) $(WIN_RES) $(CFLAGS) $(EDITOR_LDFLAGS) $(INCLUDE_PATHS) -L$(BUILD_DIR) -lbhcpp -D$(PLATFORM)
 else
 shapetest:
 	@echo "The shape tests are a desktop tool; build them with:"
 	@echo "    $(MAKE) PLATFORM=PLATFORM_DESKTOP shapetest"
 endif
 
-# Build every tool and run all the headless checks in one go:
+# Build every tool and run all the headless checks in one go (from the repo
+# root, so the tools find resources/):
 #   mingw32-make PLATFORM=PLATFORM_DESKTOP check
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
 check: $(PROJECT_NAME) editor shapetest
 	@echo "--- shape tests ---"
-	@tools/shape_test$(EXT)
+	@$(BUILD_DIR)/shape_test$(EXT)
 	@echo "--- patterns.txt vs built-in table ---"
-	@tools/pattern_editor$(EXT) --check resources/patterns.txt
+	@$(BUILD_DIR)/pattern_editor$(EXT) --check resources/patterns.txt
 	@echo "--- editor panel layout ---"
-	@tools/pattern_editor$(EXT) --layout
+	@$(BUILD_DIR)/pattern_editor$(EXT) --layout
 else
 check:
 	@echo "Run the checks on a desktop build:"
@@ -492,6 +524,8 @@ clean:
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(PLATFORM_OS),WINDOWS)
 		# recipes run through sh here, so this is rm, not cmd's del
+		rm -rf $(BUILD_DIR)
+		# also sweep the old pre-build/ layout, in case it is still around
 		rm -f *.o *.exe *.rc.data *.dll *.dll.a tools/*.exe tools/*.dll
     endif
     ifeq ($(PLATFORM_OS),LINUX)

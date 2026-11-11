@@ -33,6 +33,8 @@ typedef struct {
  *     sprite_rot travel  # upright, or travel to face the flight direction
  *     gravity 520        # px/s^2 downward, so a shot arcs like a shell
  *     script cannon      # lua in resources/scripts, replaces the spawn logic
+ *     sound shoot.wav    # a sound file in resources/, played on every shot
+ *                        # of this pattern; none = silent
  *     warn 1.5           # seconds of warning before the first shot (off = none)
  *     warn_radius 130    # size of the warning circle (point-origin patterns)
  *   end

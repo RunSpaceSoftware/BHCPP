@@ -992,6 +992,7 @@ static int check_file(const char *target)
                   (strcmp(a.sprite, b.sprite) == 0) &&
                   same_float(a.sprite_size, b.sprite_size) && (a.sprite_rot == b.sprite_rot) &&
                   same_float(a.gravity, b.gravity) && (strcmp(a.script, b.script) == 0) &&
+                  (strcmp(a.sound, b.sound) == 0) &&
                   same_float(pattern_warn_seconds(&a), pattern_warn_seconds(&b)) &&
                   same_float(a.warn_radius, b.warn_radius);
         if (!ok) {

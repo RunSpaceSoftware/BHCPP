@@ -308,6 +308,10 @@ int PatternsLoad(const char *path, PatternSet *set, char *err, int errSize)
             /* lua file in resources/scripts without ".lua"; "none" clears it */
             snprintf(cur.script, SCRIPT_NAME_MAX, "%s",
                      (strcmp(value, "none") == 0) ? "" : value);
+        } else if (strcmp(key, "sound") == 0) {
+            /* sound file in resources/ with its extension; "none" clears it */
+            snprintf(cur.sound, SOUND_NAME_MAX, "%s",
+                     (strcmp(value, "none") == 0) ? "" : value);
         } else if (strcmp(key, "sprite_rot") == 0) {
             if (strcmp(value, "none") == 0) {
                 cur.sprite_rot = SPRITE_ROT_NONE;
@@ -399,6 +403,7 @@ bool PatternsSave(const char *path, const Pattern *list, int count)
         }
         if (p.gravity != 0.0f) fprintf(f, "  gravity %g\n", p.gravity);
         if (p.script[0]) fprintf(f, "  script %s\n", p.script);
+        if (p.sound[0]) fprintf(f, "  sound %s\n", p.sound);
         if (p.warn > 0.0f) fprintf(f, "  warn %g\n", p.warn);
         else if (p.warn < 0.0f) fprintf(f, "  warn off\n");
         if (p.origin == ORIGIN_POINT && p.warn_radius != DEFAULT_WARN_RADIUS)

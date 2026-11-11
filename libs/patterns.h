@@ -45,6 +45,7 @@ typedef enum { SIDE_TOP = 0, SIDE_BOTTOM, SIDE_LEFT, SIDE_RIGHT } Side;
 #define DEFAULT_WARN_RADIUS 130.0f
 
 #define SPRITE_NAME_MAX 64
+#define SOUND_NAME_MAX 64
 #define SCRIPT_NAME_MAX 32
 
 /* How a bullet sprite is turned when drawn. */
@@ -81,6 +82,8 @@ typedef struct {
     SpriteRot sprite_rot;   /* how the sprite is turned when drawn */
     float gravity;          /* px/s^2 pulling the bullet down (0 = straight) */
     char script[SCRIPT_NAME_MAX]; /* lua file in resources/scripts, "" = none */
+    char sound[SOUND_NAME_MAX];   /* sound file in resources/, played on every
+                                     shot of this pattern; "" = silent */
     float warn;             /* seconds of warning before the first shot:
                                0 = default, > 0 = that long, < 0 = none.
                                Read it through pattern_warn_seconds(). */

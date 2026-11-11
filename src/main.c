@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "audio.h"
 #include "bullet.h"
 #include "player_stats.h"
 #include "patterns.h"
@@ -344,6 +345,7 @@ static void update_play(float dt)
             const Pattern *pat = &active[pattern_index];
             warn_pending = false;
             spawn_from_pattern(&bullets, pat, width, height, pos_x, pos_y, &spin_state);
+            AudioPlay(pat->sound);
             shot_timer = pat->delay;
             if (pat->repeat > 0) {
                 shots_left--;
@@ -433,6 +435,7 @@ int main(void)
 
     load_player_texture();
     load_player_stats();
+    AudioInit();
     reset_run();
 
     while (!WindowShouldClose() && !quit_requested) {
@@ -468,6 +471,7 @@ int main(void)
             load_player_stats();
             reset_run();          /* clears bullets, so sprite ids are safe to drop */
             reload_bullet_sprites();
+            AudioReload();
             state = STATE_MENU;
         }
 
@@ -482,6 +486,7 @@ int main(void)
     }
 
     if (have_tex) UnloadTexture(player_tex);
+    AudioClose();
     CloseWindow();
     return 0;
 }

@@ -193,6 +193,7 @@ Pattern pattern_apply_defaults(Pattern p)
     if (p.sprite_size <= 0)  p.sprite_size = p.radius * 2.0f;
     if (p.warn_radius <= 0)  p.warn_radius = DEFAULT_WARN_RADIUS;
     p.sprite[SPRITE_NAME_MAX - 1] = '\0';
+    p.sound[SOUND_NAME_MAX - 1] = '\0';
     return p;
 }
 
