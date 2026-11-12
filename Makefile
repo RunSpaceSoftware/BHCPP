@@ -42,7 +42,7 @@ BUILD_DIR = build
 # so they stay out of the copy.
 RES_DIR = resources
 RES_TOP = $(wildcard $(RES_DIR)/*.png $(RES_DIR)/*.wav $(RES_DIR)/*.ogg) \
-          $(RES_DIR)/patterns.txt $(RES_DIR)/player.txt $(RES_DIR)/LICENSE
+          $(RES_DIR)/patterns.txt $(RES_DIR)/player.txt $(RES_DIR)/pause.txt $(RES_DIR)/LICENSE
 RES_SCRIPTS = $(wildcard $(RES_DIR)/scripts/*.lua)
 RES_FILES = $(RES_TOP) $(RES_SCRIPTS)
 RES_DEST = $(BUILD_DIR)/$(RES_DIR)
@@ -401,7 +401,7 @@ OBJ_DIR = $(BUILD_DIR)/obj
 LUA_DIR = third_party/lua
 LUA_SRC = $(filter-out $(LUA_DIR)/lua.c $(LUA_DIR)/luac.c, $(wildcard $(LUA_DIR)/*.c))
 ENGINE_SRC = $(addprefix $(SRC_DIR)/,bullet.c patterns.c patterns_io.c pattern_script.c \
-             player_stats.c platform_compat.c audio.c) $(LUA_SRC)
+             player_stats.c pause_menu.c platform_compat.c audio.c) $(LUA_SRC)
 # The DLL and the executables share structs such as Pattern. A header change
 # must rebuild the DLL too, otherwise a rebuilt exe and a stale DLL disagree
 # about where the fields are.

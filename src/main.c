@@ -5,6 +5,7 @@
 #include "patterns.h"
 #include "patterns_io.h"
 #include "pattern_script.h"
+#include "pause_menu.h"
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -70,10 +71,13 @@ static const Difficulty DIFFS[] = {
 #define DIFF_COUNT 3
 
 /* ---------------- game state ---------------- */
-typedef enum { STATE_MENU, STATE_PLAY } GameState;
+typedef enum { STATE_MENU, STATE_PLAY, STATE_PAUSE } GameState;
 
-static const char *MENU_ITEMS[] = { "Start", "Difficulty", "Quit" };
-#define MENU_COUNT 3
+/* The menu itself is resources/pause.txt; these are just the defaults the
+   engine binds to it (see pause_menu.h). */
+static PauseMenu pause_menu;
+static int pause_sel = 0;
+static bool pause_run = false;   /* the run in progress can be resumed */
 
 static int width = 1200, height = 600;
 
@@ -242,80 +246,216 @@ static int player_hit(void)
     return taken;
 }
 
-/* ---------------- menu ---------------- */
-static Rectangle menu_item_rect(int i)
+/* what a pause menu `value` item can be bound to; see PauseMenuBindValue */
+static int diff_get(void) { return diff_index; }
+static void diff_set(int v) { if (v >= 0 && v < DIFF_COUNT) diff_index = v; }
+static const char *diff_text(int v) { return (v >= 0 && v < DIFF_COUNT) ? DIFFS[v].name : "?"; }
+
+/* resources/pause.txt, wherever the game was launched from; the built-in menu
+   stays in place when the file is missing or has a typo */
+static void load_pause_menu(void)
 {
-    float w = 300, h = 44;
-    return (Rectangle){ (width - w) / 2, height / 2.0f - 20 + i * 56, w, h };
+    PauseMenuBindValue("difficulty", 0, DIFF_COUNT - 1, diff_get, diff_set, diff_text);
+
+    const char *app = GetApplicationDirectory();
+    const char *candidates[] = {
+        TextFormat("%s../resources/pause.txt", app),
+        TextFormat("%sresources/pause.txt", app),
+        "resources/pause.txt",
+    };
+    char err[256] = { 0 };
+    for (int i = 0; i < 3; i++) {
+        if (!FileExists(candidates[i])) continue;
+        if (PauseMenuLoad(candidates[i], &pause_menu, err, sizeof err))
+            TraceLog(LOG_INFO, "PAUSE: %d menu items from %s", pause_menu.count, candidates[i]);
+        else
+            TraceLog(LOG_WARNING, "PAUSE: %s: %s (using the built-in menu)", candidates[i], err);
+        return;
+    }
 }
 
-static void change_diff(int step)
+/* ---------------- menu drawing ---------------- */
+/* A value row is wider than it looks, so the shared column fits the longest. */
+static int menu_column_width(const MenuItem *items, int count, int size)
 {
-    diff_index = (diff_index + step + DIFF_COUNT) % DIFF_COUNT;
+    int w = 380;
+    for (int i = 0; i < count; i++) {
+        int tw = MeasureText(PauseMenuItemText(&items[i]), size) + 60;
+        if (tw > w) w = tw;
+    }
+    return w;
+}
+
+static Rectangle menu_row_rect(int count, int index, int bw_max)
+{
+    const int row = 56, bh = 44;
+    float block_top = height / 2.0f - (count * row) / 2.0f;
+    return (Rectangle){ (width - bw_max) / 2.0f, block_top + index * row, (float)bw_max, (float)bh };
+}
+
+/* Up/down moves, left/right changes a value row, Enter takes it, mouse works
+   too. Shared by the main menu and the pause menu, and only ever reads input:
+   the drawing is a separate pass, or the pause menu would be painted over by
+   the screen dim. Returns the action taken, or MENU_ACTION_NONE. */
+static MenuAction menu_nav(const MenuItem *items, int count, int *sel, bool use_mouse)
+{
+    if (count <= 0) return MENU_ACTION_NONE;
+
+    int bw_max = menu_column_width(items, count, 24);
+
+    if (IsKeyPressed(KEY_DOWN)) *sel = (*sel + 1) % count;
+    if (IsKeyPressed(KEY_UP))   *sel = (*sel + count - 1) % count;
+
+    /* a value row is changed and applied on the spot, so Difficulty shows the
+       running game's own setting and takes effect on the next shot */
+    if (items[*sel].value[0]) {
+        int step = IsKeyPressed(KEY_RIGHT) - IsKeyPressed(KEY_LEFT);
+        if (step) PauseMenuValueSet((MenuItem *)&items[*sel],
+                                    PauseMenuStep(PauseMenuValueGet(&items[*sel]),
+                                                  items[*sel].min, items[*sel].max, step));
+    }
+
+    if (use_mouse) {
+        Vector2 mouse = GetMousePosition();
+        Vector2 delta = GetMouseDelta();
+        if (delta.x != 0 || delta.y != 0)
+            for (int i = 0; i < count; i++)
+                if (CheckCollisionPointRec(mouse, menu_row_rect(count, i, bw_max))) *sel = i;
+    }
+
+    if (IsKeyPressed(KEY_ENTER) ||
+        (use_mouse && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+         CheckCollisionPointRec(GetMousePosition(), menu_row_rect(count, *sel, bw_max))))
+        return items[*sel].action;
+    return MENU_ACTION_NONE;
+}
+
+static void draw_menu_block(const char *title, int title_size, const char *hint,
+                            const MenuItem *items, int count, int sel)
+{
+    const int size = 24;
+    int bw_max = menu_column_width(items, count, size);
+    Rectangle first = menu_row_rect(count, 0, bw_max);
+
+    if (title) draw_centered(title, (int)first.y - title_size - 24, title_size, WHITE);
+    if (hint && *hint) draw_centered(hint, height - 60, 16, GRAY);
+
+    for (int i = 0; i < count; i++) {
+        Rectangle r = menu_row_rect(count, i, bw_max);
+        bool sel_row = (i == sel);
+        DrawRectangleLines((int)r.x, (int)r.y, (int)r.width, (int)r.height, sel_row ? YELLOW : GRAY);
+
+        const char *text = PauseMenuItemText(&items[i]);
+        int tw = MeasureText(text, size);
+        DrawText(text, (int)(r.x + (bw_max - tw) / 2), (int)r.y + 10, size,
+                 sel_row ? YELLOW : WHITE);
+    }
+}
+
+/* ---------------- menu ---------------- */
+/* The main menu's items. Its Difficulty row points at the same binding the
+   pause menu uses, so the two can never disagree about the setting. */
+static int build_main_items(MenuItem *items)
+{
+    memset(items, 0, sizeof(MenuItem) * PAUSE_MAX_ITEMS);
+
+    snprintf(items[0].label, sizeof items[0].label, "Start");
+    items[0].action = MENU_ACTION_START;
+
+    snprintf(items[1].label, sizeof items[1].label, "Difficulty");
+    snprintf(items[1].value, sizeof items[1].value, "difficulty");
+    items[1].min = 0;
+    items[1].max = DIFF_COUNT - 1;
+
+    snprintf(items[2].label, sizeof items[2].label, "Quit");
+    items[2].action = MENU_ACTION_QUIT;
+    return 3;
+}
+
+#define MAIN_HINT "Arrow keys to move  |  Up/Down + Enter, Left/Right changes difficulty  |  F5: reload patterns"
+
+static void draw_menu(void)
+{
+    MenuItem items[PAUSE_MAX_ITEMS];
+    int count = build_main_items(items);
+    draw_menu_block("BULLET HELL", 60, MAIN_HINT, items, count, menu_sel);
+    if (status_timer > 0.0f)
+        draw_centered(status_text, height - 90, 18,
+                      status_ok ? (Color){ 90, 220, 120, 255 } : (Color){ 230, 70, 70, 255 });
+}
+
+static GameState start_or_quit(MenuAction a)
+{
+    if (a == MENU_ACTION_START) { reset_run(); pause_run = true; return STATE_PLAY; }
+    if (a == MENU_ACTION_QUIT)  quit_requested = true;
+    return STATE_MENU;
 }
 
 static GameState run_menu(void)
 {
-    if (IsKeyPressed(KEY_DOWN)) menu_sel = (menu_sel + 1) % MENU_COUNT;
-    if (IsKeyPressed(KEY_UP))   menu_sel = (menu_sel + MENU_COUNT - 1) % MENU_COUNT;
-
-    if (strcmp(MENU_ITEMS[menu_sel], "Difficulty") == 0) {
-        if (IsKeyPressed(KEY_RIGHT)) change_diff(1);
-        if (IsKeyPressed(KEY_LEFT))  change_diff(-1);
-    }
-
-    Vector2 mouse = GetMousePosition();
-    Vector2 delta = GetMouseDelta();
-    if (delta.x != 0 || delta.y != 0) {
-        for (int i = 0; i < MENU_COUNT; i++)
-            if (CheckCollisionPointRec(mouse, menu_item_rect(i))) menu_sel = i;
-    }
-    bool clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-                   CheckCollisionPointRec(mouse, menu_item_rect(menu_sel));
-
-    if (IsKeyPressed(KEY_ENTER) || clicked) {
-        const char *item = MENU_ITEMS[menu_sel];
-        if (strcmp(item, "Start") == 0) {
-            reset_run();
-            return STATE_PLAY;
-        }
-        if (strcmp(item, "Difficulty") == 0) change_diff(1);
-        else quit_requested = true;
-    }
-    return STATE_MENU;
+    MenuItem items[PAUSE_MAX_ITEMS];
+    int count = build_main_items(items);
+    GameState next = start_or_quit(menu_nav(items, count, &menu_sel, true));
+    if (next == STATE_PLAY) menu_sel = 0;   /* next time, start on Start */
+    return next;
 }
 
-static void draw_menu(void)
+/* ---------------- pause ---------------- */
+static void open_pause(void)
 {
-    draw_centered("BULLET HELL", height / 2 - 150, 60, WHITE);
-    draw_centered("Arrow keys to move", height / 2 - 70, 20, GRAY);
-    for (int i = 0; i < MENU_COUNT; i++) {
-        Rectangle r = menu_item_rect(i);
-        bool sel = (i == menu_sel);
-        DrawRectangleLines((int)r.x, (int)r.y, (int)r.width, (int)r.height,
-                           sel ? YELLOW : GRAY);
-        const char *label = MENU_ITEMS[i];
-        Color color = sel ? YELLOW : WHITE;
-        if (strcmp(label, "Difficulty") == 0) {
-            label = TextFormat("< %s >", DIFFS[diff_index].name);
-            color = DIFFS[diff_index].color;
-        }
-        int tw = MeasureText(label, 24);
-        DrawText(label, (int)(r.x + (r.width - tw) / 2), (int)r.y + 10, 24, color);
+    pause_run = (hp > 0);
+    pause_sel = 0;
+    state = STATE_PAUSE;
+}
+
+/* A live run gets Resume first, so backing out is always the top row; a dead
+   player's menu starts on Restart instead. */
+static int build_pause_items(MenuItem *items)
+{
+    int count = 0;
+    if (pause_run) {
+        MenuItem resume;
+        memset(&resume, 0, sizeof resume);
+        snprintf(resume.label, sizeof resume.label, "Resume");
+        resume.action = MENU_ACTION_RESUME;
+        items[count++] = resume;
     }
-    draw_centered("Up/Down + Enter, Left/Right changes difficulty  |  ESC: menu in game  |  F5: reload patterns",
-                  height - 40, 16, GRAY);
-    if (status_timer > 0.0f)
-        draw_centered(status_text, height - 70, 18,
-                      status_ok ? (Color){ 90, 220, 120, 255 } : (Color){ 230, 70, 70, 255 });
+    for (int i = 0; i < pause_menu.count && count < PAUSE_MAX_ITEMS; i++)
+        items[count++] = pause_menu.items[i];
+    return count;
+}
+
+static void draw_pause(void)
+{
+    MenuItem items[PAUSE_MAX_ITEMS];
+    int count = build_pause_items(items);
+    draw_menu_block(pause_menu.title, 40, pause_menu.hint, items, count, pause_sel);
+}
+
+/* The arena stops for as long as this runs: nothing updates, the frozen frame
+   stays on screen under the menu. */
+static void run_pause(void)
+{
+    MenuItem items[PAUSE_MAX_ITEMS];
+    int count = build_pause_items(items);
+
+    if (IsKeyPressed(KEY_ESCAPE)) { state = STATE_PLAY; return; }
+
+    switch (menu_nav(items, count, &pause_sel, true)) {
+        case MENU_ACTION_RESUME:  state = STATE_PLAY; break;
+        case MENU_ACTION_RESTART: reset_run(); pause_run = true; state = STATE_PLAY; break;
+        case MENU_ACTION_START:   reset_run(); pause_run = true; state = STATE_PLAY; break;
+        case MENU_ACTION_MENU:    state = STATE_MENU; menu_sel = 0; break;
+        case MENU_ACTION_QUIT:    quit_requested = true; break;
+        default: break;
+    }
 }
 
 /* ---------------- gameplay ---------------- */
 static void update_play(float dt)
 {
     if (IsKeyPressed(KEY_ESCAPE)) {
-        state = STATE_MENU;
-        menu_sel = 0;
+        open_pause();
         return;
     }
 
@@ -407,7 +547,7 @@ static void draw_play(void)
         draw_health_bar();
     } else {
         draw_centered("GAME OVER", height / 2 - 20, 40, RED);
-        draw_centered("R: restart   |   ESC: menu", height / 2 + 30, 20, WHITE);
+        draw_centered("ESC: pause   |   R: restart", height / 2 + 30, 20, WHITE);
     }
 }
 
@@ -435,6 +575,7 @@ int main(void)
 
     load_player_texture();
     load_player_stats();
+    load_pause_menu();
     AudioInit();
     reset_run();
 
@@ -469,19 +610,29 @@ int main(void)
             }
             status_timer = 6.0f;
             load_player_stats();
+            load_pause_menu();    /* re-reads resources/pause.txt too */
             reset_run();          /* clears bullets, so sprite ids are safe to drop */
             reload_bullet_sprites();
             AudioReload();
             state = STATE_MENU;
         }
 
-        if (state == STATE_MENU) state = run_menu();
-        else                     update_play(dt);
+        if (state == STATE_MENU)       state = run_menu();
+        else if (state == STATE_PLAY)  update_play(dt);
+        else                           run_pause();
 
         BeginDrawing();
         ClearBackground(BLACK);
-        if (state == STATE_MENU) draw_menu();
-        else                     draw_play();
+        if (state == STATE_MENU) {
+            draw_menu();
+        } else {
+            draw_play();
+            if (state == STATE_PAUSE) {
+                /* the arena is frozen: dim it, then draw the menu on top of it */
+                DrawRectangle(0, 0, width, height, (Color){ 0, 0, 0, 190 });
+                draw_pause();
+            }
+        }
         EndDrawing();
     }
 

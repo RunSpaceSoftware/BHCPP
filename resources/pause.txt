@@ -1,0 +1,38 @@
+# Bullet Hell pause menu
+#
+# This is the menu you get from ESC during a game. Edit it however you like;
+# F5 reloads it in a running game, and the shape_test covers the parsing.
+# One item per line, options after the label on that same line.
+#
+#   title <text>              the heading, at the top of the menu
+#   hint <text>               the line along the bottom
+#   item <Label> [options]    one row, in the order you write them
+#
+# A label is one word, or "several words" in quotes. Everything else on the
+# line is an option:
+#
+#   action <name>   what Enter does. One of:
+#                     resume   go back to the game
+#                     restart  start a fresh run
+#                     start    start a fresh run (same as restart)
+#                     menu     back to the main menu
+#                     quit     close the game
+#                   A "Resume" row is added by itself while a run is alive,
+#                   so you do not have to list one here.
+#
+#   value <name>    the row is a setting, changed with Left/Right and applied
+#                   right away. <name> is one the game provides:
+#                     difficulty   Easy / Normal / Hard
+#                   An item labelled after a value (`item Difficulty`) becomes
+#                   that value without you saying so.
+#
+#   start <n>       where a value row starts instead of its minimum
+#
+# An item with no options at all is a plain label (a heading, a credit line).
+
+title PAUSED
+hint Up/Down chooses  |  Left/Right changes a setting  |  ESC resumes
+
+item Restart action restart
+item Difficulty value difficulty
+item "Quit To Menu" action menu

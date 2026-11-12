@@ -16,6 +16,7 @@
 #include "player_stats.h"
 #include "patterns_io.h"
 #include "pattern_script.h"
+#include "pause_menu.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -603,6 +604,106 @@ static void test_player_stats(void)
     }
 }
 
+/* pause: the shipped resources/pause.txt parses, value rows follow the
+   binding they name, and a typo falls back to the built-in menu instead of
+   leaving the game with no way to unpause */
+static int pause_test_diff = 0;
+
+static int pause_diff_get(void) { return pause_test_diff; }
+static void pause_diff_set(int v) { pause_test_diff = v; }
+static const char *pause_diff_text(int v)
+{
+    static const char *NAMES[] = { "Easy", "Normal", "Hard" };
+    return (v >= 0 && v < 3) ? NAMES[v] : "?";
+}
+
+static bool write_pause(const char *text)
+{
+    FILE *f = fopen("build/__t_pause.txt", "wb");
+    if (!f) return false;
+    fputs(text, f);
+    fclose(f);
+    return true;
+}
+
+static void test_pause_menu(void)
+{
+    printf("pause menu:\n");
+    PauseMenu m;
+    char err[256] = { 0 };
+
+    PauseMenuBindValue("difficulty", 0, 2, pause_diff_get, pause_diff_set, pause_diff_text);
+    pause_test_diff = 1;
+
+    check(PauseMenuLoad("resources/pause.txt", &m, err, sizeof err),
+          "the shipped resources/pause.txt parses");
+    check(m.count == 3, "it has three rows");
+    check(strcmp(m.items[2].label, "Quit To Menu") == 0 &&
+          m.items[2].action == MENU_ACTION_MENU,
+          "a quoted label keeps its spaces");
+    check(strcmp(m.items[1].label, "Difficulty") == 0 &&
+          strcmp(m.items[1].value, "difficulty") == 0,
+          "`item Difficulty` picks up the difficulty binding by name");
+    check(m.items[1].min == 0 && m.items[1].max == 2, "the binding's range is used");
+    check(PauseMenuValueGet(&m.items[1]) == 1, "the row reads the game's live difficulty");
+    check(m.items[1].action == MENU_ACTION_NONE, "a value row is not an action row");
+
+    pause_test_diff = 2;
+    check(strstr(PauseMenuItemText(&m.items[1]), "Hard") != NULL,
+          "the row shows the difficulty's own name");
+
+    check(PauseMenuStep(2, 0, 2, 1) == 0 && PauseMenuStep(0, 0, 2, -1) == 2,
+          "stepping wraps around the ends");
+    check(PauseMenuStep(1, 0, 0, 1) == 0, "a one-value range cannot move");
+
+    check(write_pause("title Hello\nhint Be nice\nitem Resume action resume\n"
+                      "item Boom action quit\nitem Note\n"), "wrote the throwaway pause.txt");
+    memset(err, 0, sizeof err);
+    check(PauseMenuLoad("build/__t_pause.txt", &m, err, sizeof err),
+          "a hand-written file parses");
+    check(m.count == 3 && m.items[0].action == MENU_ACTION_RESUME &&
+          m.items[1].action == MENU_ACTION_QUIT,
+          "actions are picked up");
+    check(m.items[2].action == MENU_ACTION_NONE && m.items[2].value[0] == '\0',
+          "an item with no options is just a label");
+    check(strcmp(m.title, "Hello") == 0 && strcmp(m.hint, "Be nice") == 0,
+          "title and hint are read");
+
+    pause_test_diff = 0;
+    check(write_pause("item Loudness value difficulty start 99\n") &&
+          PauseMenuLoad("build/__t_pause.txt", &m, err, sizeof err) &&
+          pause_test_diff == 2 && strcmp(m.items[0].label, "Loudness") == 0,
+          "`start` is clamped to the binding's range and the label is kept");
+
+    pause_test_diff = 1;
+    PauseMenuDefaults(&m);
+    check(write_pause("item Broken action explode\n"), "wrote a bad action");
+    check(!PauseMenuLoad("build/__t_pause.txt", &m, err, sizeof err),
+          "an unknown action is rejected");
+    check(strstr(err, "explode") != NULL, "the error names the bad action");
+    check(m.count == 3, "the built-in menu is kept after a bad file");
+
+    check(write_pause("item Anything value nosuchthing\n") &&
+          !PauseMenuLoad("build/__t_pause.txt", &m, err, sizeof err),
+          "a value the game never registered is rejected");
+
+    check(write_pause("wobble 3\n") &&
+          !PauseMenuLoad("build/__t_pause.txt", &m, err, sizeof err),
+          "an unknown key is rejected");
+
+    /* a menu with no rows would leave ESC doing nothing */
+    PauseMenuDefaults(&m);
+    check(write_pause("# nothing but comments\n") &&
+          !PauseMenuLoad("build/__t_pause.txt", &m, err, sizeof err) && m.count > 0,
+          "an empty file falls back to the built-in menu");
+
+    PauseMenuDefaults(&m);
+    check(PauseMenuLoad("build/__t_absent_pause.txt", &m, err, sizeof err) && m.count > 0,
+          "a missing file falls back to the built-in menu");
+
+    remove("build/__t_pause.txt");
+}
+
 int main(void)
 {
     printf("shape tests\n===========\n");
@@ -619,6 +720,7 @@ int main(void)
     test_script_safety();
     test_warn_and_reload();
     test_player_stats();
+    test_pause_menu();
 
     printf("\n%s (%d failure%s)\n",
            failures ? "FAILED" : "all good", failures, failures == 1 ? "" : "s");

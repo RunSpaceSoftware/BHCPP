@@ -33,14 +33,20 @@ spears, geometric formations, lobbed gravity shells and scripted mortar fire.
   file or a machine with no sound card just stays silent.
 - **Editable player.** HP, move speed, size and invulnerability time live in
   `resources/player.txt` and the editor can change them too.
+- **A pause menu as data.** `Esc` pauses mid-game; the menu it opens is written
+  in `resources/pause.txt`, one row per line. A row is a built-in action
+  (`resume`, `restart`, `start`, `menu`, `quit`), a setting the player changes
+  with `Left`/`Right`, or a plain label - in whatever order the file lists
+  them. `F5` reloads it. A missing or misspelled file keeps the built-in menu,
+  so the game can never end up unpausable.
 - **A pattern editor.** `build/pattern_editor.exe` lists every pattern, previews
   it live against a movable player marker, and exposes all of its fields as
   sliders and pickers, plus a sprite picker filled from the PNGs you have
   dropped in.
 - **Checks.** A headless test binary covers the shape geometry, the Lua spawn
-  path, the sprite plumbing and the stats parser; two more checks keep
-  `patterns.txt` and the built-in table in sync and prove the editor panel fits
-  its window.
+  path, the sprite plumbing, the stats parser and the pause menu file; two more
+  checks keep `patterns.txt` and the built-in table in sync and prove the editor
+  panel fits its window.
 
 ## Requirements
 
@@ -77,7 +83,8 @@ Everything lands in `build/`, including the intermediate `.o` files. Sources are
 `src/*.c`, headers are `libs/*.h`.
 
 Each build also copies the assets the game loads - the PNGs, `patterns.txt`,
-`player.txt`, `scripts/*.lua` and the asset `LICENSE` - into `build/resources/`,
+`player.txt`, `pause.txt`, `scripts/*.lua` and the asset `LICENSE` - into
+`build/resources/`,
 so `build/` is self-contained and can be zipped and run anywhere. The copy is
 refreshed whenever an asset changes and starts from a clean folder, so an asset
 deleted from `resources/` disappears from `build/resources/` too.
@@ -104,8 +111,10 @@ running an executable straight from `build/` inside the repo still works.
 
 - Menu: `Up`/`Down` to choose, `Left`/`Right` to change difficulty, `Enter` to
   start, `Esc` to quit.
-- In game: arrow keys to move, `R` to restart after game over, `Esc` for the
-  menu, `F5` to reload patterns, sprites, sounds, scripts and player stats
+- In game: arrow keys to move, `Esc` to pause. The pause menu resumes the run,
+  restarts it, changes the difficulty or goes back to the main menu, depending
+  on what `resources/pause.txt` lists. `R` restarts after game over, `F5`
+  reloads patterns, sprites, sounds, scripts, player stats and the pause menu
   without restarting. If `patterns.txt` has a typo, F5 says so on the menu and
   keeps the patterns you already had.
 - Patterns that fire from a fixed point (rings, spirals, lattices) flash a
@@ -143,8 +152,9 @@ build/pattern_editor.exe resources/patterns.txt
 mingw32-make PLATFORM=PLATFORM_DESKTOP check
 ```
 
-Builds everything and runs three checks: the shape/script/stats tests,
-`patterns.txt` against the built-in table, and the editor panel-fit check.
+Builds everything and runs three checks: the shape/script/stats/pause-menu
+tests, `patterns.txt` against the built-in table, and the editor panel-fit
+check.
 Run it from the repo root - the stats test writes its scratch files into
 `tools/`. The script test writes three throwaway `.lua` files into the folder
 the engine actually reads, `build/resources/scripts`, and deletes them again.
@@ -158,6 +168,7 @@ by double-clicking it.
   `patterns.txt`.
 - `resources/patterns.txt` - the patterns.
 - `resources/player.txt` - hp, speed, size, invuln.
+- `resources/pause.txt` - the pause menu's rows, labels and hint.
 - `resources/*.png` - bullet sprites, picked per pattern with `sprite`.
 - `resources/*.wav` - sound effects, picked per pattern with `sound`.
 - `resources/scripts/aims.lua` - spawn logic for the built-in aims.
@@ -173,8 +184,9 @@ by double-clicking it.
   like the sound effects.
 - [ ] **Level system** - group patterns into levels and move on to the next one
   when a level is cleared.
-- [ ] **Better menu and a pause button** - a proper menu, plus pausing mid-game
-  instead of only being able to restart.
+- [x] **Better menu and a pause button** - a proper menu, plus pausing mid-game
+  instead of only being able to restart. The pause menu's rows come from
+  `resources/pause.txt`.
 - [ ] **Window-scaled bullet counts** - a mode where the number of bullets
   follows the window size, so a bigger window means a denser pattern.
 - [ ] **Customizable game over screen** - the death screen's text and look
