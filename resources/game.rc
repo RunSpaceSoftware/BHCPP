@@ -5,11 +5,11 @@
  *  the built .exe: the icon in Explorer, and everything under
  *  right-click -> Properties -> Details.
  *
- *  The Makefile compiles this file with windres on every Windows build and
+ *  CMake compiles this file with windres on every Windows build and
  *  links the result into the executable, so whatever is here is what the
  *  next build of main.exe / game.exe will carry.
  *
- *  Rebuild:  mingw32-make PLATFORM=PLATFORM_DESKTOP
+ *  Rebuild:  cmake --build build
  * ========================================================================== */
 
 /* --------------------------------------------------------------------------

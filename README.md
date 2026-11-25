@@ -1,200 +1,180 @@
 # BHCPP
 
-A small bullet-hell engine and playable demo, written in C99 on top of
-[raylib](https://www.raylib.com/). Everything that makes the game interesting is
-meant to be tuned without touching C: the attack patterns, the bullets
-themselves, the sounds, and the player's own numbers all live in plain files
-under `resources/`, and a standalone editor edits them while you watch the
-result.
+A small bullet-hell **game** on top of a reusable C99 **engine**, built with
+[raylib](https://www.raylib.com/). The game owns the run, menus and scoring;
+the engine owns the window, time, input, resources, scene graph, level format,
+immediate-mode UI and the editor. The editor can open the game's scene, edit it
+visually, and play the game inside the viewport without leaving the tool.
 
-Bullet-hell in this sense is a top-down dodging game: enemies never appear, the
-arena simply fills with overlapping patterns of projectiles and the player stays
-alive by reading the gaps between them. The engine ships 33 of those patterns,
-from fans and spirals to walls with one safe slot, converging rings, piercing
-spears, geometric formations, lobbed gravity shells and scripted mortar fire.
+The demo ships 33 patterns: fans, spirals, walls with one safe slot,
+converging rings, piercing spears, geometric formations, lobbed gravity shells
+and scripted mortar fire. Patterns, bullets, sounds, levels and the player's
+numbers are plain files under `resources/`.
+
+## Engine / game split
+
+```
+build/bhcpp.dll      engine + game module + raylib + Lua
+build/game.exe       thin host: window loop + GameUpdate/GameDraw
+build/editor.exe     engine editor: scene, hierarchy, inspector, dock tabs
+build/shape_test.exe headless checks
+```
+
+- `libs/engine.h`, `src/engine/engine.c` - window/frame lifecycle, delta and
+  scaled time, paths, logging, engine audio device.
+- `libs/input.h`, `src/engine/input.c` - action map and move vector.
+- `libs/console.h`, `src/engine/console.c` - 256-line console with 32 commands.
+- `libs/assets.h`, `src/engine/assets.c` - texture/sound/music caches, reload.
+- `libs/scene.h`, `src/engine/scene.c` - 256-entity scene graph, parented
+  transforms, sprites, colliders, `.scene` text format.
+- `libs/level.h`, `src/engine/level.c` - named pattern waves in `levels.txt`.
+- `libs/ui.h`, `src/engine/ui.c` - dark dockable-workbench widgets and icons.
+- `libs/game.h`, `src/game/game.c` - the game client. Windowless: it draws into
+  the current render target, so the standalone host paints the screen and the
+  editor paints a `RenderTexture2D` for play-in-editor.
 
 ## What is in the box
 
-- **Patterns as data.** Each pattern is a block of text in
-  `resources/patterns.txt` - origin, aim, count, spread, speed, delay,
-  repeat, damage, radius, colour, sprite, spin, gravity and shape parameters.
-  `F5` reloads them in a running game.
-- **All spawn logic in Lua.** Lua 5.4 is embedded. The built-in aims live in
-  `resources/scripts/aims.lua`, so `player`, `angle`, `radial`, `wall`, `rain`,
-  `crossfire`, `encircle`, `cross`, `spear`, `formation` and `alternate` are
-  editable scripts rather than compiled C. A pattern can also point at its own
-  script with the `script` key and take over spawning completely.
-- **Bullets are PNGs.** Drop any image into `resources/` and a pattern can use
-  it with `sprite`. The hitbox stays the pattern's `radius`, so art never
-  changes how hard a pattern is to dodge. Circles remain the fallback when no
-  sprite is set or the file is missing.
-- **Sounds as data.** Drop a `.wav` or `.ogg` into `resources/` and give a
-  pattern `sound shoot.wav`; it plays on every shot of that pattern. A missing
-  file or a machine with no sound card just stays silent.
-- **Editable player.** HP, move speed, size and invulnerability time live in
-  `resources/player.txt` and the editor can change them too.
-- **A pause menu as data.** `Esc` pauses mid-game; the menu it opens is written
-  in `resources/pause.txt`, one row per line. A row is a built-in action
-  (`resume`, `restart`, `start`, `menu`, `quit`), a setting the player changes
-  with `Left`/`Right`, or a plain label - in whatever order the file lists
-  them. `F5` reloads it. A missing or misspelled file keeps the built-in menu,
-  so the game can never end up unpausable.
-- **A pattern editor.** `build/pattern_editor.exe` lists every pattern, previews
-  it live against a movable player marker, and exposes all of its fields as
-  sliders and pickers, plus a sprite picker filled from the PNGs you have
-  dropped in.
-- **Checks.** A headless test binary covers the shape geometry, the Lua spawn
-  path, the sprite plumbing, the stats parser and the pause menu file; two more
-  checks keep `patterns.txt` and the built-in table in sync and prove the editor
-  panel fits its window.
+- **Visual editor.** Menu bar, toolbar, Hierarchy/Assets, scene viewport with
+  grid, gizmos, snapping and picking, Inspector, and Console/Patterns/Levels
+  dock tabs. Draggable splitters, undo/redo, `Ctrl+S`, `F5` reload.
+- **Play in editor.** The Game tab runs the real game at 1200x600 in the
+  viewport; pause, step one frame and stop without recompiling.
+- **Scenes.** `resources/scenes/main.scene` stores the arena, player spawn,
+  parented entities, sprites and colliders. Missing files are created as a
+  default scene in the engine's user directory.
+- **Levels.** `resources/levels.txt` groups pattern names into waves. The game
+  advances through them; the editor edits the same file.
+- **Patterns as data.** Every field of a pattern is editable in the Patterns
+  tab, with a live preview. `F5` reloads the running game.
+- **All spawn logic in Lua.** Lua 5.4.7 is embedded. The built-in aims live in
+  `resources/scripts/aims.lua`; a pattern can point at its own script with
+  `script` and take over spawning completely.
+- **Assets as data.** Drop a PNG, WAV or OGG in `resources/`, then assign it in
+  the editor or a pattern. A missing file falls back to the circle/no-sound
+  path.
+- **Editable player and pause menu.** `resources/player.txt` holds HP, speed,
+  size and invulnerability. `resources/pause.txt` holds the pause rows.
+- **Checks.** Shape geometry, Lua spawn path, sprite plumbing, stats parser,
+  pause menu, pattern-table sync and editor layout are all headless.
 
 ## Requirements
 
-You need **raylib installed** - it is not vendored, and nothing runs or builds
-without it:
+- **CMake 3.20+**.
+- **raylib 6.2**, static library and headers at `C:/raylib/raylib/src`.
+- **gcc (MinGW-w64)**, by default `C:/raylib/w64devkit/bin`.
 
-- **raylib 6.2**, built as a static library, with its headers and library
-  reachable at `C:/raylib/raylib/src`.
-- **gcc (MinGW-w64)**, by default at `C:/raylib/w64devkit/bin`. The Makefile
-  uses `windres` and GNU ld features, so a MinGW toolchain on Windows is what
-  this is built and tested with.
-
-Both locations can be overridden on the command line:
+Both raylib paths are overridable:
 
 ```
-mingw32-make PLATFORM=PLATFORM_DESKTOP RAYLIB_PATH=D:/raylib/raylib COMPILER_PATH=D:/mingw64/bin
+cmake -S . -B build -G "MinGW Makefiles" -DRAYLIB_ROOT=D:/raylib/raylib
 ```
 
-Lua is the one dependency you do *not* install: 5.4.7 is vendored in
-`third_party/lua` under the MIT licence, whose notice travels in `lua.h`.
+Lua 5.4.7 is vendored in `third_party/lua` under the MIT licence. Do not edit
+it; pattern scripts live in `resources/scripts/`.
 
 ## Build
 
 ```
-mingw32-make PLATFORM=PLATFORM_DESKTOP            # build/bhcpp.dll + build/game.exe
-mingw32-make PLATFORM=PLATFORM_DESKTOP editor     # build/pattern_editor.exe
-mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest  # build/shape_test.exe
+cmake -S . -B build -G "MinGW Makefiles"
+cmake --build build                       # bhcpp.dll, game.exe and the tools
+cmake --build build --target check        # build + run every check
 ```
 
-`PLATFORM=PLATFORM_DESKTOP` is required. The Makefile defaults to the web
-target, which does not link against a desktop raylib.
+Use the MinGW generator so CMake picks gcc rather than Visual Studio.
+Everything lands in `build/`. The engine DLL also gets the GLFW joystick
+shims on Windows; without them a broken DirectInput install can make raylib
+report `PLATFORM: Failed to initialize graphics device` before any window
+appears.
 
-Everything lands in `build/`, including the intermediate `.o` files. Sources are
-`src/*.c`, headers are `libs/*.h`.
-
-Each build also copies the assets the game loads - the PNGs, `patterns.txt`,
-`player.txt`, `pause.txt`, `scripts/*.lua` and the asset `LICENSE` - into
-`build/resources/`,
-so `build/` is self-contained and can be zipped and run anywhere. The copy is
-refreshed whenever an asset changes and starts from a clean folder, so an asset
-deleted from `resources/` disappears from `build/resources/` too.
-`resources/game.rc` and `resources/icon.ico` are build inputs, not assets, and
-stay out of the copy.
-
-## The engine DLL
-
-The engine - patterns, spawning, Lua scripting, player stats - is built as
-`build/bhcpp.dll`, together with raylib and Lua. `build/game.exe` is only
-`src/main.c` and imports everything from the DLL, which keeps the engine
-reusable by anything else that wants to link `build/libbhcpp.dll.a`.
-
-DLL and executables must stay together, so every executable is written into
-`build/` next to `bhcpp.dll` - the game, the editor and the shape tests alike.
-raylib is linked into the DLL only - a second copy in an executable would mean
-two GLFW contexts and two copies of raylib's global state.
+The asset copy includes `patterns.txt`, `levels.txt`, `player.txt`,
+`pause.txt`, `scenes/*.scene`, `scripts/*.lua`, PNGs, WAV/OGG and the asset
+LICENSE. `resources/game.rc` and `icon.ico` are build inputs, not assets.
 
 ## Play
 
-Run `build/game.exe`. It finds its assets in `build/resources/`; if that folder
-is missing the loaders look one folder up and then in the current directory, so
-running an executable straight from `build/` inside the repo still works.
+Run `build/game.exe`.
 
-- Menu: `Up`/`Down` to choose, `Left`/`Right` to change difficulty, `Enter` to
-  start, `Esc` to quit.
-- In game: arrow keys to move, `Esc` to pause. The pause menu resumes the run,
-  restarts it, changes the difficulty or goes back to the main menu, depending
-  on what `resources/pause.txt` lists. `R` restarts after game over, `F5`
-  reloads patterns, sprites, sounds, scripts, player stats and the pause menu
-  without restarting. If `patterns.txt` has a typo, F5 says so on the menu and
-  keeps the patterns you already had.
-- Patterns that fire from a fixed point (rings, spirals, lattices) flash a
-  warning circle for a second first, so you can get off the spot. Set `warn`
-  and `warn_radius` per pattern in `patterns.txt` (`warn off` removes it).
-- The window cannot be made smaller than 800x480; below that the holes in the
-  bullet walls get too narrow to fit through.
+- Menu: `Up`/`Down` choose, `Left`/`Right` change difficulty, `Enter` starts,
+  `Esc` quits.
+- In game: arrow keys move, `Esc` pauses. `R` restarts after game over, `F5`
+  reloads patterns, sprites, sounds, scripts, player stats, levels and the
+  pause menu without restarting. A typo in `patterns.txt` is reported on the
+  menu and the previous table is kept.
+- Fixed-point patterns flash a warning circle first. Set `warn` and
+  `warn_radius` per pattern; `warn off` removes it.
+- The window cannot be made smaller than 800x480.
 
 ## Edit
 
-Run `build/pattern_editor.exe` from the repo root (it is a console program, so
-messages like "could not write ..." stay visible).
+Run `build/editor.exe` from the repo root.
 
-Because the editor sits next to the copied assets, `Ctrl+S` writes
-`build/resources/patterns.txt` and `build/resources/player.txt` - the copy the
-game next to it reads, so you can save and press `F5` in the game. To write the
-tracked files instead, pass the path, and rebuild so the copy picks the change
-up:
-
-```
-build/pattern_editor.exe resources/patterns.txt
-```
-
-- Click a pattern in the list to preview it; move the mouse over the arena to
-  move the player marker the patterns aim at.
-- Sliders and pickers on the right edit the selected pattern; the block under
-  the arena edits the player.
-- `Space` pauses the preview, `R` restarts it, `Up`/`Down` change pattern,
-  `Ctrl+S` writes `patterns.txt` and `player.txt`, `Ctrl+R` reloads both from
-  disk.
+- **Scene** tab in the viewport: click to select, `W`/`E`/`R`/`T` or the
+  toolbar switch Select/Move/Rotate/Scale. Drag the gizmo axes; right or middle
+  drag pans, wheel zooms. `G` toggles the grid, `S` snapping.
+- **Hierarchy** shows parented entities. Add, duplicate (`Ctrl+D`) and delete
+  (`Del`); the Inspector edits name, tag, parent, transform, sprite, tint and
+  collider.
+- **Assets** assigns a PNG to the selected sprite, opens a scene, or reloads
+  scripts.
+- **Game** tab (or the toolbar Play button) runs the real game in the
+  viewport. Pause, Step and Stop are next to it.
+- **Console** accepts engine commands such as `help`, `scene`, `assets` and
+  `clear`; Up/Down walks command history.
+- **Patterns** edits every field with a live 1200x600 preview. Add, delete and
+  save back to `patterns.txt`; Up/Down changes the selection.
+- **Levels** edits the level set, adds/removes patterns by name and saves
+  `levels.txt`.
+- `Ctrl+S` saves the scene; `Ctrl+Z`/`Ctrl+Y` undo/redo; `F5` reloads patterns,
+  levels, assets and the scene. Unsaved tabs show `*`.
+- Layout is saved per run; `View > Reset Layout` restores the default docks.
 
 ## Checks
 
 ```
-mingw32-make PLATFORM=PLATFORM_DESKTOP check
+cmake --build build --target check
 ```
 
-Builds everything and runs three checks: the shape/script/stats/pause-menu
-tests, `patterns.txt` against the built-in table, and the editor panel-fit
-check.
-Run it from the repo root - the stats test writes its scratch files into
-`tools/`. The script test writes three throwaway `.lua` files into the folder
-the engine actually reads, `build/resources/scripts`, and deletes them again.
-`build/shape_test.exe` prints its results, so run it from a terminal rather than
-by double-clicking it.
+Builds the game, editor and tools, then runs:
+
+- `build/shape_test.exe` - geometry, Lua, sprites, stats, pause menu, scene
+  graph and level round trips.
+- `build/editor.exe --check` - `patterns.txt`, `scenes/main.scene` and
+  `levels.txt` all load.
+- `build/editor.exe --layout` - the dock layout fits 1100x700 and up.
+- `build/pattern_editor.exe --check resources/patterns.txt` - the legacy
+  pattern editor still validates the file.
+
+The stats and script tests write throwaway files under `tools/` and
+`build/resources/scripts` and remove them again. Run the checks from the repo
+root.
 
 ## Files
 
-- `src/*.c` - the engine and the game; `build/game.exe` is `src/main.c` only.
-- `libs/*.h` - the engine headers; `libs/patterns_io.h` documents every key of
-  `patterns.txt`.
-- `resources/patterns.txt` - the patterns.
-- `resources/player.txt` - hp, speed, size, invuln.
-- `resources/pause.txt` - the pause menu's rows, labels and hint.
-- `resources/*.png` - bullet sprites, picked per pattern with `sprite`.
-- `resources/*.wav` - sound effects, picked per pattern with `sound`.
-- `resources/scripts/aims.lua` - spawn logic for the built-in aims.
-- `resources/scripts/*.lua` - per-pattern scripts, picked with `script`.
-  Scripts only get the base, coroutine, table, string, math and utf8
-  libraries - no `io`, `os` or `require` - so a shared pattern pack cannot
-  touch your files.
-- `tools/make_sprites.py` - regenerates the sample sprites (needs Pillow).
+- `CMakeLists.txt` - the build: engine DLL, game host, editor and tools.
+- `src/engine/*.c` - engine modules; `src/game/game.c` - game module;
+  `src/main.c` - standalone host.
+- `libs/*.h` - public engine, game and tool APIs.
+- `resources/scenes/main.scene` - the demo scene.
+- `resources/levels.txt` - pattern waves.
+- `resources/patterns.txt` - the pattern table.
+- `resources/player.txt`, `resources/pause.txt` - player and pause data.
+- `resources/scripts/aims.lua` - built-in aim logic.
+- `resources/scripts/*.lua` - per-pattern scripts.
+- `resources/*.png`, `*.wav`, `*.ogg` - assets.
+- `tools/editor.c` - engine editor; `tools/pattern_editor.c` - pattern tool;
+  `tools/shape_test.c` - headless tests.
 
 ## TODO
 
-- [ ] **Music** - a background track for the engine, loaded from `resources/`
-  like the sound effects.
-- [ ] **Level system** - group patterns into levels and move on to the next one
-  when a level is cleared.
-- [x] **Better menu and a pause button** - a proper menu, plus pausing mid-game
-  instead of only being able to restart. The pause menu's rows come from
-  `resources/pause.txt`.
-- [ ] **Window-scaled bullet counts** - a mode where the number of bullets
-  follows the window size, so a bigger window means a denser pattern.
-- [ ] **Customizable game over screen** - the death screen's text and look
-  configurable from `resources/`.
-- [ ] **Dialogue system** - text-based conversations, for story lines before or
-  after a level.
+- [x] **Level system** - named waves in `levels.txt`, with editor support.
+- [x] **Editor** - Unity/Unreal-style docks, scene view, inspector and
+  play-in-editor.
+- [ ] **Music** - the engine asset cache can play a track, but the game does
+  not start one yet.
+- [ ] **Dialogue system** - text before or after a level.
 
 ## Licence
 
-The game and its assets are licensed CC BY 4.0 - see `resources/LICENSE`.
-Vendored Lua 5.4.7 is MIT; see the notice in `third_party/lua/lua.h`.
+The game and its assets are CC BY 4.0 - see `resources/LICENSE`. Vendored Lua
+5.4.7 is MIT; see `third_party/lua/lua.h`.

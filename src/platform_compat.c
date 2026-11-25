@@ -10,7 +10,7 @@
  *
  * Neither the game nor the editor uses gamepads, so the joystick subsystem is
  * skipped altogether. The linker redirects GLFW's joystick entry points here
- * with -Wl,--wrap=... (see WIN_LDFLAGS in the Makefile). */
+ * with -Wl,--wrap=... (see CMakeLists.txt). */
 
 #if defined(_WIN32)
 void *__wrap_glfwSetJoystickCallback(void *callback) { (void)callback; return 0; }

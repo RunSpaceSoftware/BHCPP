@@ -1,0 +1,28 @@
+# BHCPP Engine scene
+# Edit in the engine editor or by hand.
+
+scene "Main"
+
+entity "Arena"
+  tag "arena"
+  parent -1
+  position 0.0000 0.0000
+  rotation 0.0000
+  scale 1200.0000 600.0000
+  visible 1
+  layer 0
+  tint 70 110 180 255
+end
+
+entity "Player Spawn"
+  tag "player_spawn"
+  parent -1
+  position 600.0000 300.0000
+  rotation 0.0000
+  scale 1.0000 1.0000
+  visible 1
+  layer 1
+  sprite "player"
+  sprite_size 32.0000 32.0000
+  tint 255 255 255 255
+end

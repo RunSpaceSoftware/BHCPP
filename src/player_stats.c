@@ -1,5 +1,6 @@
 #include "player_stats.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +22,13 @@ bool PlayerStatsLoad(const char *path, PlayerStats *out, char *err, int errSize)
     if (!path) return true;
 
     FILE *f = fopen(path, "rb");
-    if (!f) return true;   /* absent file simply means "all defaults" */
+    if (!f) {
+        /* absent file simply means "all defaults"; an existing file that
+           cannot be opened is an error the caller should hear about */
+        if (errno == ENOENT) return true;
+        if (err) snprintf(err, errSize, "cannot open %s: %s", path, strerror(errno));
+        return false;
+    }
 
     char line[512];
     int lineNo = 0;
@@ -70,7 +77,7 @@ bool PlayerStatsSave(const char *path, const PlayerStats *s)
     if (!f) return false;
 
     fprintf(f, "# Bullet Hell player stats\n");
-    fprintf(f, "# Written by tools/pattern_editor - you can also edit this by hand.\n\n");
+    fprintf(f, "# Written by the level editor - you can also edit this by hand.\n\n");
     fprintf(f, "hp %d\n", s->max_hp);
     fprintf(f, "speed %g\n", s->speed);
     fprintf(f, "size %g\n", s->size);

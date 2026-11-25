@@ -74,7 +74,12 @@ int PauseMenuValueGet(const MenuItem *item)
     if (!item || !item->value[0]) return 0;
     const Binding *b = find_binding(item->value);
     if (!b) return item->current;          /* unbound: the file's own value */
-    if (!b->get) return b->min;            /* no game value: whatever the row holds */
+    if (!b->get) {                          /* no game value: whatever the row holds */
+        int v = item->current;
+        if (v < item->min) return item->min;
+        if (v > item->max) return item->max;
+        return v;
+    }
     int v = b->get();
     if (v < b->min) return b->min;
     if (v > b->max) return b->max;

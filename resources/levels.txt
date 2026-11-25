@@ -1,0 +1,45 @@
+# Levels group pattern names from patterns.txt into waves.
+
+level "Warm Up"
+  pattern single_aimed
+  pattern fan5_aimed
+  pattern aimed_jitter
+  pattern bottom_volley
+end
+
+level "Ring Logic"
+  pattern ring32
+  pattern spiral
+  pattern spiral_double
+  pattern lattice
+  pattern encircle
+  pattern encircle_gap
+  pattern cross_close
+end
+
+level "Walls and Rain"
+  pattern wall_gap
+  pattern wall_solid
+  pattern wall_bottom_gap
+  pattern wall_right_gap
+  pattern rain
+  pattern rain_down
+  pattern rain_side
+  pattern alternate_walls
+end
+
+level "Heavy"
+  pattern crossfire
+  pattern crossfire_fast
+  pattern burst_right
+  pattern ring_left
+  pattern ring_right
+  pattern spiral_triple
+  pattern spear_thrust
+  pattern spear_lance
+  pattern formation_flower
+  pattern formation_pincer
+  pattern cannon_lob
+  pattern cannon_drop
+  pattern script_mortar
+end

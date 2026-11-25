@@ -65,16 +65,14 @@ local function base_angle(c, ox, oy, angle, spin)
   if c.aim == "player" then
     return math.atan(c.player_y - oy, c.player_x - ox)
   elseif c.aim == "angle" then
-    if not c.has_angle and c.spin == 0 then
-      local o = c.origin
-      if o == "top" then return math.pi / 2 end
-      if o == "bottom" then return -math.pi / 2 end
-      if o == "left" then return 0 end
-      if o == "right" then return math.pi end
-      return 0
-    end
+    if c.has_angle then return angle + spin end
     if c.spin ~= 0 then return spin end
-    return angle
+    local o = c.origin
+    if o == "top" then return math.pi / 2 end
+    if o == "bottom" then return -math.pi / 2 end
+    if o == "left" then return 0 end
+    if o == "right" then return math.pi end
+    return 0
   elseif c.aim == "radial" then
     return math.atan(oy - c.height / 2, ox - c.width / 2)
   end

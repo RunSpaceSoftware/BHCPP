@@ -1,6 +1,6 @@
 /* Headless sanity check for the spear and formation shapes.
- * Build:  mingw32-make PLATFORM=PLATFORM_DESKTOP shapetest
- * Run:    tools\shape_test.exe
+ * Build:  cmake --build build --target shape_test
+ * Run:    build\shape_test.exe
  *
  * No window is created - GetRandomValue() works without one - so this can run
  * on a machine with no display. It checks the geometric invariants that are
@@ -17,6 +17,8 @@
 #include "patterns_io.h"
 #include "pattern_script.h"
 #include "pause_menu.h"
+#include "scene.h"
+#include "level.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -704,6 +706,71 @@ static void test_pause_menu(void)
     remove("build/__t_pause.txt");
 }
 
+static void test_scene_levels(void)
+{
+    printf("scene graph:\n");
+    Scene s;
+    SceneDefault(&s);
+    check(s.count == 2, "default scene has arena and spawn");
+    check(SceneFindTag(&s, "player_spawn") >= 0, "player_spawn tag is found");
+
+    /* The arena marker carries the room size in its scale; neutralise it so
+       this test checks parent translation, not the arena's 1200x600 scale. */
+    SceneEntity(&s, 0)->scale = (Vector2){ 2, 3 };
+    int child = SceneAdd(&s, "Child");
+    check(child == 2, "SceneAdd appends an entity");
+    check(SceneSetParent(&s, child, 0), "a parent can be assigned");
+    check(!SceneSetParent(&s, 0, child), "a parent cycle is rejected");
+    SceneEntity(&s, child)->position = (Vector2){ 10, 20 };
+    Vector2 wp = SceneWorldPosition(&s, child);
+    check(near(wp.x, 20, 0.001f) && near(wp.y, 60, 0.001f), "parent scale reaches the child");
+    SceneEntity(&s, 0)->scale = (Vector2){ 1, 1 };
+
+    SceneEntity(&s, 0)->position = (Vector2){ 100, 50 };
+    wp = SceneWorldPosition(&s, child);
+    check(near(wp.x, 110, 0.001f) && near(wp.y, 70, 0.001f), "child moves with its parent");
+
+    SceneEntity(&s, 0)->position = (Vector2){ 0, 0 };
+    snprintf(SceneEntity(&s, child)->name, SCENE_NAME_MAX, "Ch\"ild");
+    int dup = SceneDuplicate(&s, child);
+    check(dup >= 0 && s.items[dup].parent == 0, "duplicate keeps the original parent");
+
+    /* The copy can be inserted before its own parent, which shifts that
+       parent one slot to the right. */
+    int early = SceneAdd(&s, "Early");
+    int late = SceneAdd(&s, "Late");
+    check(SceneSetParent(&s, early, late), "early entity gets a later parent");
+    int early_dup = SceneDuplicate(&s, early);
+    check(early_dup >= 0 && s.items[early_dup].parent == late + 1,
+          "duplicate follows a parent shifted by the insert");
+
+    check(SceneSave(&s, "build/__t_scene.txt"), "scene saves");
+    Scene loaded;
+    char err[256] = { 0 };
+    check(SceneLoad(&loaded, "build/__t_scene.txt", err, sizeof err), "scene loads back");
+    check(loaded.count == s.count, "entity count survives the round trip");
+    check(strcmp(loaded.items[child].name, "Ch'ild") == 0, "entity name survives and quotes are safe");
+    check(loaded.items[child].parent == 0, "parent link survives");
+    remove("build/__t_scene.txt");
+
+    SceneRemove(&s, 0);
+    int promoted = SceneFind(&s, "Ch\"ild");
+    check(promoted >= 0 && s.items[promoted].parent == -1,
+          "removing a parent promotes its children");
+
+    printf("levels:\n");
+    const char *names[] = { "a", "b", "c" };
+    LevelSet levels;
+    check(LevelsDefault(&levels, names, 3), "default level is built");
+    check(levels.count == 1 && levels.items[0].pattern_count == 3, "all patterns land in the default level");
+    check(LevelsSave("build/__t_levels.txt", &levels), "levels save");
+    LevelSet loaded_levels;
+    check(LevelsLoad("build/__t_levels.txt", &loaded_levels, err, sizeof err), "levels load back");
+    check(loaded_levels.count == 1 && loaded_levels.items[0].pattern_count == 3, "level round trip keeps patterns");
+    check(strcmp(loaded_levels.items[0].patterns[1], "b") == 0, "pattern order survives");
+    check(LevelsFind(&loaded_levels, "All Patterns") == 0, "levels can be found by name");
+    remove("build/__t_levels.txt");
+}
 int main(void)
 {
     printf("shape tests\n===========\n");
@@ -721,6 +788,7 @@ int main(void)
     test_warn_and_reload();
     test_player_stats();
     test_pause_menu();
+    test_scene_levels();
 
     printf("\n%s (%d failure%s)\n",
            failures ? "FAILED" : "all good", failures, failures == 1 ? "" : "s");

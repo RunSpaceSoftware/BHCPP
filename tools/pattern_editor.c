@@ -6,9 +6,9 @@
  *  resources/patterns.txt, the file the game reads at start-up, so there is
  *  no rebuild step: edit, save, run the game.
  *
- *  Build:  mingw32-make editor
- *  Run:    tools\pattern_editor.exe            (window)
- *          tools\pattern_editor.exe --check    (verify the file against the
+ *  Build:  cmake --build build --target pattern_editor
+ *  Run:    build\pattern_editor.exe            (window)
+ *          build\pattern_editor.exe --check    (verify the file against the
  *                                               built-in table in patterns.c)
  *          tools\pattern_editor.exe --export resources/patterns.txt
  *                                              (write the built-in table out)

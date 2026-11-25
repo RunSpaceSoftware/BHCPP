@@ -342,6 +342,7 @@ int PatternsLoad(const char *path, PatternSet *set, char *err, int errSize)
     }
 
     fclose(f);
+    set->count = count;
     return count;
 
 fail:

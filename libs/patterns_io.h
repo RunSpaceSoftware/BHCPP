@@ -12,6 +12,7 @@
 typedef struct {
     Pattern items[MAX_PATTERNS];
     char    names[MAX_PATTERNS][PATTERN_NAME_MAX];
+    int     count;
 } PatternSet;
 
 /* ---------------------------------------------------------------- file I/O

@@ -16,12 +16,13 @@ authored by a human.
 ## Before committing
 
 ```
-mingw32-make PLATFORM=PLATFORM_DESKTOP check
+cmake -S . -B build -G "MinGW Makefiles"
+cmake --build build --target check
 ```
 
-Builds the game, editor and shape tests, then runs all three checks.
-`PLATFORM=PLATFORM_DESKTOP` is required; the Makefile defaults to WEB and
-that fails to link.
+Builds the game, editor and shape tests, then runs the shape suite, the
+editor's pattern/scene/level validation, the panel-layout check, and the
+legacy pattern-file check.
 
 ## Third-party code
 
