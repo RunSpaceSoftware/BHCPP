@@ -27,6 +27,31 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
 endif()
 
 # RES_TOP at CMakeLists.txt:122 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "D:/Projects/BulletHellCPP/resources/*.otf")
+set(OLD_GLOB
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  set(NEW_ONLY ${NEW_GLOB})
+  set(OLD_ONLY ${OLD_GLOB})
+  list(REMOVE_ITEM NEW_ONLY ${OLD_GLOB})
+  list(REMOVE_ITEM OLD_ONLY ${NEW_GLOB})
+  if(NEW_ONLY)
+    message("The following files were added:")
+    foreach(VAR_FILE IN LISTS NEW_ONLY)
+      message("  +${VAR_FILE}")
+    endforeach()
+  endif()
+  if(OLD_ONLY)
+    message("The following files were removed:")
+    foreach(VAR_FILE IN LISTS OLD_ONLY)
+      message("  -${VAR_FILE}")
+    endforeach()
+  endif()
+  file(TOUCH_NOCREATE "D:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs")
+endif()
+
+# RES_TOP at CMakeLists.txt:122 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "D:/Projects/BulletHellCPP/resources/*.png")
 set(OLD_GLOB
   "D:/Projects/BulletHellCPP/resources/bullet_hex.png"
@@ -35,6 +60,31 @@ set(OLD_GLOB
   "D:/Projects/BulletHellCPP/resources/bullet_spear.png"
   "D:/Projects/BulletHellCPP/resources/bullet_star.png"
   "D:/Projects/BulletHellCPP/resources/player.png"
+  )
+if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
+  message("-- GLOB mismatch!")
+  set(NEW_ONLY ${NEW_GLOB})
+  set(OLD_ONLY ${OLD_GLOB})
+  list(REMOVE_ITEM NEW_ONLY ${OLD_GLOB})
+  list(REMOVE_ITEM OLD_ONLY ${NEW_GLOB})
+  if(NEW_ONLY)
+    message("The following files were added:")
+    foreach(VAR_FILE IN LISTS NEW_ONLY)
+      message("  +${VAR_FILE}")
+    endforeach()
+  endif()
+  if(OLD_ONLY)
+    message("The following files were removed:")
+    foreach(VAR_FILE IN LISTS OLD_ONLY)
+      message("  -${VAR_FILE}")
+    endforeach()
+  endif()
+  file(TOUCH_NOCREATE "D:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs")
+endif()
+
+# RES_TOP at CMakeLists.txt:122 (file)
+file(GLOB NEW_GLOB LIST_DIRECTORIES true "D:/Projects/BulletHellCPP/resources/*.ttf")
+set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
@@ -137,7 +187,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "D:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs")
 endif()
 
-# RES_SCENES at CMakeLists.txt:129 (file)
+# RES_SCENES at CMakeLists.txt:131 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "D:/Projects/BulletHellCPP/resources/scenes/*.scene")
 set(OLD_GLOB
   "D:/Projects/BulletHellCPP/resources/scenes/main.scene"
@@ -163,7 +213,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "D:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs")
 endif()
 
-# RES_SCRIPTS at CMakeLists.txt:128 (file)
+# RES_SCRIPTS at CMakeLists.txt:130 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "D:/Projects/BulletHellCPP/resources/scripts/*.lua")
 set(OLD_GLOB
   "D:/Projects/BulletHellCPP/resources/scripts/aims.lua"

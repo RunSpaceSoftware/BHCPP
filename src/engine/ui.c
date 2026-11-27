@@ -5,10 +5,20 @@
 #include <stdio.h>
 #include <string.h>
 
+#define UI_FONT_CACHE_MAX 24
+
+typedef struct {
+    int size;
+    Font font;
+} UIFontSlot;
+
 static UITheme g_theme;
 static Font g_default_font;
 static bool g_font_loaded = false;
 static bool g_initialized = false;
+static char g_font_path[4096];
+static UIFontSlot g_font_cache[UI_FONT_CACHE_MAX];
+static int g_font_cache_count = 0;
 
 static Vector2 g_mouse = { 0, 0 };
 static Rectangle g_clips[UI_MAX_CLIP];
@@ -24,7 +34,7 @@ static int g_focus_cap = 0;
 static int g_active_id = 0;
 static char g_tooltip[256];
 
-#define UI_TEXT_SPACING 0.25f
+#define UI_TEXT_SPACING 0.0f
 #define UI_HEADER_H 28.0f
 #define UI_ROW_H 22.0f
 
@@ -67,9 +77,30 @@ static Rectangle intersect_rect(Rectangle a, Rectangle b)
     return (Rectangle){ x1, y1, x2 - x1, y2 - y1 };
 }
 
-static Font ui_font(void)
+/* Rasterise each label at the exact size it is drawn. Scaling even a 2x
+   atlas leaves the thin 10-12 px stems uneven; native glyphs stay crisp. */
+static Font *ui_font_for(int size)
 {
-    return (g_theme.font.texture.id != 0) ? g_theme.font : GetFontDefault();
+    if (size < 6) size = 6;
+    if (g_theme.font.texture.id != 0 && g_theme.font.baseSize == size)
+        return &g_theme.font;
+    for (int i = 0; i < g_font_cache_count; i++) {
+        if (g_font_cache[i].size == size) return &g_font_cache[i].font;
+    }
+    if (!g_font_path[0] || g_font_cache_count >= UI_FONT_CACHE_MAX)
+        return &g_theme.font;
+
+    UIFontSlot *slot = &g_font_cache[g_font_cache_count];
+    slot->size = size;
+    slot->font = LoadFontEx(g_font_path, size, NULL, 0);
+    if (slot->font.texture.id == 0) {
+        slot->font = g_theme.font;
+        g_font_cache_count++;
+        return &g_theme.font;
+    }
+    SetTextureFilter(slot->font.texture, TEXTURE_FILTER_BILINEAR);
+    g_font_cache_count++;
+    return &slot->font;
 }
 
 static bool font_is_custom(void)
@@ -132,12 +163,28 @@ void UIInit(void)
 
     Font font = { 0 };
     char path[4096];
-    if (EngineResolveResource("ui_font.ttf", path, sizeof path))
-        font = try_load_font(path, 32);
-    if (font.texture.id == 0) font = try_load_font("C:/Windows/Fonts/segoeui.ttf", 32);
-    if (font.texture.id == 0) font = try_load_font("C:/Windows/Fonts/arial.ttf", 32);
-    if (font.texture.id == 0) font = try_load_font("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 32);
-    if (font.texture.id == 0) font = try_load_font("/System/Library/Fonts/Supplemental/Arial.ttf", 32);
+    g_font_path[0] = '\0';
+    g_font_cache_count = 0;
+
+    if (EngineResolveResource("ui_font.ttf", path, sizeof path)) {
+        font = try_load_font(path, 64);
+        if (font.texture.id != 0) snprintf(g_font_path, sizeof g_font_path, "%s", path);
+    }
+    if (font.texture.id == 0) {
+        static const char *fallbacks[] = {
+            "C:/Windows/Fonts/segoeui.ttf",
+            "C:/Windows/Fonts/arial.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf"
+        };
+        for (int i = 0; i < (int)(sizeof fallbacks / sizeof fallbacks[0]); i++) {
+            font = try_load_font(fallbacks[i], 64);
+            if (font.texture.id != 0) {
+                snprintf(g_font_path, sizeof g_font_path, "%s", fallbacks[i]);
+                break;
+            }
+        }
+    }
 
     if (font.texture.id != 0) {
         g_theme.font = font;
@@ -145,6 +192,12 @@ void UIInit(void)
     } else {
         g_theme.font = g_default_font;
         g_font_loaded = false;
+    }
+    if (g_font_loaded) {
+        (void)ui_font_for(g_theme.font_small);
+        (void)ui_font_for(g_theme.font_normal);
+        (void)ui_font_for(g_theme.font_large);
+        (void)ui_font_for(g_theme.font_title);
     }
     g_clip_count = 0;
     g_blocked = false;
@@ -157,6 +210,14 @@ void UIInit(void)
 void UIShutdown(void)
 {
     if (!g_initialized) return;
+    for (int i = 0; i < g_font_cache_count; i++) {
+        if (g_font_cache[i].font.texture.id != 0 &&
+            g_font_cache[i].font.texture.id != g_default_font.texture.id &&
+            g_font_cache[i].font.texture.id != g_theme.font.texture.id)
+            UnloadFont(g_font_cache[i].font);
+    }
+    g_font_cache_count = 0;
+    g_font_path[0] = '\0';
     if (font_is_custom()) UnloadFont(g_theme.font);
     g_theme.font = g_default_font;
     g_font_loaded = false;
@@ -215,13 +276,14 @@ int UIHash(const char *text)
 void UIDrawText(const char *text, float x, float y, int size, Color color)
 {
     if (!text || !*text || size <= 0) return;
-    DrawTextEx(ui_font(), text, (Vector2){ x, y }, (float)size, UI_TEXT_SPACING, color);
+    Vector2 pos = { floorf(x + 0.5f), floorf(y + 0.5f) };
+    DrawTextEx(*ui_font_for(size), text, pos, (float)size, UI_TEXT_SPACING, color);
 }
 
 float UITextWidth(const char *text, int size)
 {
     if (!text || !*text) return 0.0f;
-    return MeasureTextEx(ui_font(), text, (float)size, UI_TEXT_SPACING).x;
+    return MeasureTextEx(*ui_font_for(size), text, (float)size, UI_TEXT_SPACING).x;
 }
 
 void UIDrawTextCentered(const char *text, Rectangle r, int size, Color color)

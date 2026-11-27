@@ -894,7 +894,10 @@ static void draw_dropdown(Editor *ed)
         if (clicked) { clicked_inside = true; menu_do(ed, e->action); ed->menu_open = -1; break; }
     }
 
-    if (!clicked_inside && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !UIMouseInRaw(box))
+    /* The same press that opened the menu is still down here. Ignore clicks
+       on the menu bar, otherwise the dropdown closes on the opening click. */
+    if (!clicked_inside && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+        !UIMouseInRaw(box) && !UIMouseInRaw(ed->layout.menu))
         ed->menu_open = -1;
 }
 
@@ -1733,10 +1736,16 @@ static void draw_viewport(Editor *ed)
     DrawRectangleRec(inner, t->viewport);
 
     if (ed->playing && ed->game && ed->play_rt_ready) {
+        /* The UI clip is in screen coordinates. If it stays active while the
+           game renders into its own 1200x600 target, the target is clipped
+           by the viewport's screen offset and the game appears cut in half. */
+        Rectangle clip = UIClipRect();
+        EndScissorMode();
         BeginTextureMode(ed->play_rt);
         ClearBackground(BLACK);
         GameDraw(ed->game);
         EndTextureMode();
+        BeginScissorMode((int)clip.x, (int)clip.y, (int)clip.width, (int)clip.height);
 
         Vector2 origin; float scale;
         Rectangle dest = play_dest(ed, &origin, &scale);
@@ -2285,8 +2294,12 @@ static void draw_splitters(Editor *ed)
     bool hover_l = UIMouseIn(L->left_split);
     bool hover_r = UIMouseIn(L->right_split);
     bool hover_b = UIMouseIn(L->bottom_split);
-    if (hover_l || hover_r) SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
-    else if (hover_b) SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
+    if (hover_l || hover_r || ed->split_drag == 1 || ed->split_drag == 2)
+        SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+    else if (hover_b || ed->split_drag == 3)
+        SetMouseCursor(MOUSE_CURSOR_RESIZE_NS);
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     if (hover_l && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) ed->split_drag = 1;
     if (hover_r && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) ed->split_drag = 2;
     if (hover_b && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) ed->split_drag = 3;

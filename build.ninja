@@ -57,8 +57,6 @@ build CMakeFiles/bhcpp.dir/src/bullet.c.obj: C_COMPILER__bhcpp_unscanned_Release
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/patterns.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/patterns.c || cmake_object_order_depends_target_bhcpp
@@ -69,8 +67,6 @@ build CMakeFiles/bhcpp.dir/src/patterns.c.obj: C_COMPILER__bhcpp_unscanned_Relea
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/patterns_io.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/patterns_io.c || cmake_object_order_depends_target_bhcpp
@@ -81,8 +77,6 @@ build CMakeFiles/bhcpp.dir/src/patterns_io.c.obj: C_COMPILER__bhcpp_unscanned_Re
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/pattern_script.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/pattern_script.c || cmake_object_order_depends_target_bhcpp
@@ -93,8 +87,6 @@ build CMakeFiles/bhcpp.dir/src/pattern_script.c.obj: C_COMPILER__bhcpp_unscanned
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/player_stats.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/player_stats.c || cmake_object_order_depends_target_bhcpp
@@ -105,8 +97,6 @@ build CMakeFiles/bhcpp.dir/src/player_stats.c.obj: C_COMPILER__bhcpp_unscanned_R
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/pause_menu.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/pause_menu.c || cmake_object_order_depends_target_bhcpp
@@ -117,8 +107,6 @@ build CMakeFiles/bhcpp.dir/src/pause_menu.c.obj: C_COMPILER__bhcpp_unscanned_Rel
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/platform_compat.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/platform_compat.c || cmake_object_order_depends_target_bhcpp
@@ -129,8 +117,6 @@ build CMakeFiles/bhcpp.dir/src/platform_compat.c.obj: C_COMPILER__bhcpp_unscanne
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/audio.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/audio.c || cmake_object_order_depends_target_bhcpp
@@ -141,8 +127,6 @@ build CMakeFiles/bhcpp.dir/src/audio.c.obj: C_COMPILER__bhcpp_unscanned_Release 
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/engine.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/engine.c || cmake_object_order_depends_target_bhcpp
@@ -153,8 +137,6 @@ build CMakeFiles/bhcpp.dir/src/engine/engine.c.obj: C_COMPILER__bhcpp_unscanned_
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/input.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/input.c || cmake_object_order_depends_target_bhcpp
@@ -165,8 +147,6 @@ build CMakeFiles/bhcpp.dir/src/engine/input.c.obj: C_COMPILER__bhcpp_unscanned_R
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/console.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/console.c || cmake_object_order_depends_target_bhcpp
@@ -177,8 +157,6 @@ build CMakeFiles/bhcpp.dir/src/engine/console.c.obj: C_COMPILER__bhcpp_unscanned
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/assets.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/assets.c || cmake_object_order_depends_target_bhcpp
@@ -189,8 +167,6 @@ build CMakeFiles/bhcpp.dir/src/engine/assets.c.obj: C_COMPILER__bhcpp_unscanned_
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/scene.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/scene.c || cmake_object_order_depends_target_bhcpp
@@ -201,8 +177,6 @@ build CMakeFiles/bhcpp.dir/src/engine/scene.c.obj: C_COMPILER__bhcpp_unscanned_R
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/level.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/level.c || cmake_object_order_depends_target_bhcpp
@@ -213,8 +187,6 @@ build CMakeFiles/bhcpp.dir/src/engine/level.c.obj: C_COMPILER__bhcpp_unscanned_R
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/engine/ui.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/engine/ui.c || cmake_object_order_depends_target_bhcpp
@@ -225,8 +197,6 @@ build CMakeFiles/bhcpp.dir/src/engine/ui.c.obj: C_COMPILER__bhcpp_unscanned_Rele
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\engine
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/src/game/game.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/src/game/game.c || cmake_object_order_depends_target_bhcpp
@@ -237,8 +207,6 @@ build CMakeFiles/bhcpp.dir/src/game/game.c.obj: C_COMPILER__bhcpp_unscanned_Rele
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\src\game
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lapi.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lapi.c || cmake_object_order_depends_target_bhcpp
@@ -249,8 +217,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lapi.c.obj: C_COMPILER__bhcpp_unscann
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lauxlib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lauxlib.c || cmake_object_order_depends_target_bhcpp
@@ -261,8 +227,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lauxlib.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lbaselib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lbaselib.c || cmake_object_order_depends_target_bhcpp
@@ -273,8 +237,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lbaselib.c.obj: C_COMPILER__bhcpp_uns
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lcode.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lcode.c || cmake_object_order_depends_target_bhcpp
@@ -285,8 +247,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lcode.c.obj: C_COMPILER__bhcpp_unscan
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lcorolib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lcorolib.c || cmake_object_order_depends_target_bhcpp
@@ -297,8 +257,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lcorolib.c.obj: C_COMPILER__bhcpp_uns
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lctype.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lctype.c || cmake_object_order_depends_target_bhcpp
@@ -309,8 +267,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lctype.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ldblib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ldblib.c || cmake_object_order_depends_target_bhcpp
@@ -321,8 +277,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ldblib.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ldebug.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ldebug.c || cmake_object_order_depends_target_bhcpp
@@ -333,8 +287,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ldebug.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ldo.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ldo.c || cmake_object_order_depends_target_bhcpp
@@ -345,8 +297,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ldo.c.obj: C_COMPILER__bhcpp_unscanne
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ldump.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ldump.c || cmake_object_order_depends_target_bhcpp
@@ -357,8 +307,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ldump.c.obj: C_COMPILER__bhcpp_unscan
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lfunc.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lfunc.c || cmake_object_order_depends_target_bhcpp
@@ -369,8 +317,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lfunc.c.obj: C_COMPILER__bhcpp_unscan
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lgc.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lgc.c || cmake_object_order_depends_target_bhcpp
@@ -381,8 +327,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lgc.c.obj: C_COMPILER__bhcpp_unscanne
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/linit.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/linit.c || cmake_object_order_depends_target_bhcpp
@@ -393,8 +337,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/linit.c.obj: C_COMPILER__bhcpp_unscan
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/liolib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/liolib.c || cmake_object_order_depends_target_bhcpp
@@ -405,8 +347,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/liolib.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/llex.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/llex.c || cmake_object_order_depends_target_bhcpp
@@ -417,8 +357,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/llex.c.obj: C_COMPILER__bhcpp_unscann
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lmathlib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lmathlib.c || cmake_object_order_depends_target_bhcpp
@@ -429,8 +367,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lmathlib.c.obj: C_COMPILER__bhcpp_uns
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lmem.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lmem.c || cmake_object_order_depends_target_bhcpp
@@ -441,8 +377,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lmem.c.obj: C_COMPILER__bhcpp_unscann
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/loadlib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/loadlib.c || cmake_object_order_depends_target_bhcpp
@@ -453,8 +387,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/loadlib.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lobject.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lobject.c || cmake_object_order_depends_target_bhcpp
@@ -465,8 +397,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lobject.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lopcodes.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lopcodes.c || cmake_object_order_depends_target_bhcpp
@@ -477,8 +407,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lopcodes.c.obj: C_COMPILER__bhcpp_uns
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/loslib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/loslib.c || cmake_object_order_depends_target_bhcpp
@@ -489,8 +417,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/loslib.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lparser.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lparser.c || cmake_object_order_depends_target_bhcpp
@@ -501,8 +427,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lparser.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lstate.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lstate.c || cmake_object_order_depends_target_bhcpp
@@ -513,8 +437,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lstate.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lstring.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lstring.c || cmake_object_order_depends_target_bhcpp
@@ -525,8 +447,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lstring.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lstrlib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lstrlib.c || cmake_object_order_depends_target_bhcpp
@@ -537,8 +457,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lstrlib.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ltable.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ltable.c || cmake_object_order_depends_target_bhcpp
@@ -549,8 +467,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ltable.c.obj: C_COMPILER__bhcpp_unsca
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ltablib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ltablib.c || cmake_object_order_depends_target_bhcpp
@@ -561,8 +477,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ltablib.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/ltm.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/ltm.c || cmake_object_order_depends_target_bhcpp
@@ -573,8 +487,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/ltm.c.obj: C_COMPILER__bhcpp_unscanne
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lundump.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lundump.c || cmake_object_order_depends_target_bhcpp
@@ -585,8 +497,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lundump.c.obj: C_COMPILER__bhcpp_unsc
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lutf8lib.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lutf8lib.c || cmake_object_order_depends_target_bhcpp
@@ -597,8 +507,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lutf8lib.c.obj: C_COMPILER__bhcpp_uns
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lvm.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lvm.c || cmake_object_order_depends_target_bhcpp
@@ -609,8 +517,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lvm.c.obj: C_COMPILER__bhcpp_unscanne
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 build CMakeFiles/bhcpp.dir/third_party/lua/lzio.c.obj: C_COMPILER__bhcpp_unscanned_Release D$:/Projects/BulletHellCPP/third_party/lua/lzio.c || cmake_object_order_depends_target_bhcpp
@@ -621,8 +527,6 @@ build CMakeFiles/bhcpp.dir/third_party/lua/lzio.c.obj: C_COMPILER__bhcpp_unscann
   INCLUDES = -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external -ID:/Projects/BulletHellCPP/third_party/lua
   OBJECT_DIR = CMakeFiles\bhcpp.dir
   OBJECT_FILE_DIR = CMakeFiles\bhcpp.dir\third_party\lua
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
-  TARGET_PDB = bhcpp.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 
@@ -642,10 +546,9 @@ build bhcpp.dll libbhcpp.dll.a: C_SHARED_LIBRARY_LINKER__bhcpp_Release CMakeFile
   POST_BUILD = cd .
   PRE_LINK = cd .
   RESTAT = 1
-  TARGET_COMPILE_PDB = CMakeFiles\bhcpp.dir\
   TARGET_FILE = bhcpp.dll
   TARGET_IMPLIB = libbhcpp.dll.a
-  TARGET_PDB = bhcpp.pdb
+  TARGET_PDB = bhcpp.dll.dbg
   TARGET_SUPPORT_DIR = CMakeFiles\bhcpp.dir
 
 
@@ -671,8 +574,6 @@ build CMakeFiles/game.dir/src/main.c.obj: C_COMPILER__game_unscanned_Release D$:
   INCLUDES = -ID:/Projects/BulletHellCPP/third_party/lua -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\game.dir\
-  TARGET_PDB = game.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\game.dir
 
 
@@ -691,10 +592,9 @@ build game.exe: C_EXECUTABLE_LINKER__game_Release game.rc.data CMakeFiles/game.d
   OBJECT_DIR = CMakeFiles\game.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\game.dir\
   TARGET_FILE = game.exe
   TARGET_IMPLIB = libgame.dll.a
-  TARGET_PDB = game.pdb
+  TARGET_PDB = game.exe.dbg
   TARGET_SUPPORT_DIR = CMakeFiles\game.dir
 
 # =============================================================================
@@ -714,8 +614,6 @@ build CMakeFiles/editor.dir/tools/editor.c.obj: C_COMPILER__editor_unscanned_Rel
   INCLUDES = -ID:/Projects/BulletHellCPP/third_party/lua -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external
   OBJECT_DIR = CMakeFiles\editor.dir
   OBJECT_FILE_DIR = CMakeFiles\editor.dir\tools
-  TARGET_COMPILE_PDB = CMakeFiles\editor.dir\
-  TARGET_PDB = editor.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\editor.dir
 
 
@@ -733,10 +631,9 @@ build editor.exe: C_EXECUTABLE_LINKER__editor_Release game.rc.data CMakeFiles/ed
   OBJECT_DIR = CMakeFiles\editor.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\editor.dir\
   TARGET_FILE = editor.exe
   TARGET_IMPLIB = libeditor.dll.a
-  TARGET_PDB = editor.pdb
+  TARGET_PDB = editor.exe.dbg
   TARGET_SUPPORT_DIR = CMakeFiles\editor.dir
 
 # =============================================================================
@@ -756,8 +653,6 @@ build CMakeFiles/shape_test.dir/tools/shape_test.c.obj: C_COMPILER__shape_test_u
   INCLUDES = -ID:/Projects/BulletHellCPP/third_party/lua -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external
   OBJECT_DIR = CMakeFiles\shape_test.dir
   OBJECT_FILE_DIR = CMakeFiles\shape_test.dir\tools
-  TARGET_COMPILE_PDB = CMakeFiles\shape_test.dir\
-  TARGET_PDB = shape_test.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\shape_test.dir
 
 
@@ -775,10 +670,9 @@ build shape_test.exe: C_EXECUTABLE_LINKER__shape_test_Release game.rc.data CMake
   OBJECT_DIR = CMakeFiles\shape_test.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\shape_test.dir\
   TARGET_FILE = shape_test.exe
   TARGET_IMPLIB = libshape_test.dll.a
-  TARGET_PDB = shape_test.pdb
+  TARGET_PDB = shape_test.exe.dbg
   TARGET_SUPPORT_DIR = CMakeFiles\shape_test.dir
 
 # =============================================================================
@@ -798,8 +692,6 @@ build CMakeFiles/pattern_editor.dir/tools/pattern_editor.c.obj: C_COMPILER__patt
   INCLUDES = -ID:/Projects/BulletHellCPP/third_party/lua -ID:/Projects/BulletHellCPP/libs -ID:/Projects/BulletHellCPP -IC:/raylib/raylib/src -IC:/raylib/raylib/src/external
   OBJECT_DIR = CMakeFiles\pattern_editor.dir
   OBJECT_FILE_DIR = CMakeFiles\pattern_editor.dir\tools
-  TARGET_COMPILE_PDB = CMakeFiles\pattern_editor.dir\
-  TARGET_PDB = pattern_editor.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\pattern_editor.dir
 
 
@@ -817,10 +709,9 @@ build pattern_editor.exe: C_EXECUTABLE_LINKER__pattern_editor_Release game.rc.da
   OBJECT_DIR = CMakeFiles\pattern_editor.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\pattern_editor.dir\
   TARGET_FILE = pattern_editor.exe
   TARGET_IMPLIB = libpattern_editor.dll.a
-  TARGET_PDB = pattern_editor.pdb
+  TARGET_PDB = pattern_editor.exe.dbg
   TARGET_SUPPORT_DIR = CMakeFiles\pattern_editor.dir
 
 
@@ -933,14 +824,14 @@ build D$:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs: VERIFY_GLOBS | D
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja D$:/Projects/BulletHellCPP/cmake_install.cmake: RERUN_CMAKE D$:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs | C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCCompiler.cmake.in C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCCompilerABI.c C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCommonLanguageInclude.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCompilerIdDetection.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompilerABI.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompilerId.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompilerSupport.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineRCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeFindBinUtils.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeGenericSystem.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeInitializeConfigs.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeLanguageInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeNinjaFindMake.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeParseImplicitLinkInfo.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeParseLibraryArchitecture.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeRCCompiler.cmake.in C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeRCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystem.cmake.in C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInitialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeTestCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeTestCompilerCommon.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeTestRCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/CrayClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Diab-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-FindBinUtils.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/LCC-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/OrangeC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/PellesC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Renesas-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/TI-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/TIClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Tasking-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCommonLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeDetermineLinkerId.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeInspectCLinker.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/FeatureTesting.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-Initialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-windres.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/4.4.4/CMakeCCompiler.cmake CMakeFiles/4.4.4/CMakeRCCompiler.cmake CMakeFiles/4.4.4/CMakeSystem.cmake CMakeLists.txt D$:/Projects/BulletHellCPP/CMakeFiles/VerifyGlobs.cmake
+build build.ninja D$:/Projects/BulletHellCPP/cmake_install.cmake: RERUN_CMAKE D$:/Projects/BulletHellCPP/CMakeFiles/cmake.verify_globs | C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCommonLanguageInclude.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeGenericSystem.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeInitializeConfigs.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeLanguageInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeRCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInitialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCommonLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-Initialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-windres.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/4.4.4/CMakeCCompiler.cmake CMakeFiles/4.4.4/CMakeRCCompiler.cmake CMakeFiles/4.4.4/CMakeSystem.cmake CMakeLists.txt D$:/Projects/BulletHellCPP/CMakeFiles/VerifyGlobs.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCCompiler.cmake.in C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCCompilerABI.c C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCommonLanguageInclude.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCompilerIdDetection.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompilerABI.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompilerId.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineCompilerSupport.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineRCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeFindBinUtils.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeGenericSystem.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeInitializeConfigs.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeLanguageInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeNinjaFindMake.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeParseImplicitLinkInfo.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeParseLibraryArchitecture.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeRCCompiler.cmake.in C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeRCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystem.cmake.in C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInitialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeTestCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeTestCompilerCommon.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeTestRCCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/CrayClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Diab-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-FindBinUtils.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/LCC-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/OrangeC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/PellesC-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Renesas-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/TI-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/TIClang-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Tasking-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCommonLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeDetermineLinkerId.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeInspectCLinker.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/FeatureTesting.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-Initialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-windres.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/4.4.4/CMakeCCompiler.cmake CMakeFiles/4.4.4/CMakeRCCompiler.cmake CMakeFiles/4.4.4/CMakeSystem.cmake CMakeLists.txt D$:/Projects/BulletHellCPP/CMakeFiles/VerifyGlobs.cmake: phony
+build C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeCommonLanguageInclude.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeGenericSystem.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeInitializeConfigs.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeLanguageInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeRCInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/CMakeSystemSpecificInitialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Compiler/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Internal/CMakeCommonLinkerInformation.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Linker/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C-ABI.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU-C.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-GNU.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-Initialize.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows-windres.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/Windows.cmake C$:/raylib/w64devkit/share/cmake-4.4/Modules/Platform/WindowsPaths.cmake CMakeCache.txt CMakeFiles/4.4.4/CMakeCCompiler.cmake CMakeFiles/4.4.4/CMakeRCCompiler.cmake CMakeFiles/4.4.4/CMakeSystem.cmake CMakeLists.txt D$:/Projects/BulletHellCPP/CMakeFiles/VerifyGlobs.cmake: phony
 
 
 #############################################

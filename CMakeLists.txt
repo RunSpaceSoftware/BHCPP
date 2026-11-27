@@ -124,6 +124,8 @@ file(GLOB RES_TOP CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.wav"
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.ogg"
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.ttf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.otf"
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/LICENSE")
 file(GLOB RES_SCRIPTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/resources/scripts/*.lua")
 file(GLOB RES_SCENES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/resources/scenes/*.scene")
